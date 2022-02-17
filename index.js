@@ -103,12 +103,18 @@ class DockerClient {
 
   const app = express();
   app.use("/", expressStatic('public'));
-  //app.use(httpServer);
 
-  //instanciate a new http server
-  const httpServer = http.createServer(app);
+/*const server = app.listen(3000); 
+//app.use(httpServer);
+server.on('upgrade', (request, socket, head) => { 
+  wsServer.handleUpgrade(request, socket, head, 
+  socket => { //instanciate a new http server const 
+  httpServer = http.createServer(app);
+    wsServer.emit('connection', socket, request);
+  }); //instantiate a new WebSocketServer
+});*/
 
-  //instantiate a new WebSocketServer
+
   const wss = new WebSocketServer({
     noServer: true
   });
@@ -124,11 +130,21 @@ class DockerClient {
     });
   });
 
-  //if the httpServer gets an 'upgrade' event we need to switch our connection to our websocket.
-  httpServer.on('upgrade', function upgrade(request, socket, head) {
+  const server = app.listen(process.env.WEBSOCKET_PORT ?? 8085, () => {console.log("Listening")}); 
+    server.on('upgrade', (request, socket, head) => {
+      wss.handleUpgrade(request, socket, head, socket => {
+      //if the httpServer gets an 'upgrade' event we need to switch our connection to our 
+        wss.emit('connection', socket, request);
+      });
+    });
+
+/*httpServer.on('upgrade', function 
+  upgrade(request, socket, head) {
+    wsServer.emit('connection', socket, request); 
     console.log("upgrade request");
-    //get property pathname of parse return object
-    const { pathname } = parse(request.url);
+  }); //get property pathname of parse return 
+  }object
+});    const { pathname } = parse(request.url);
     console.log(pathname);
 
     //if the http request was for our path defined in $WEBSOCKET_PATH, we hand over the connection to our server
@@ -153,7 +169,7 @@ class DockerClient {
   const PORT = process.env.WEBSOCKET_PORT ?? 8085;
   httpServer.listen(PORT, () => {
     console.log("[WebSocket] Listening on *:" + PORT);
-  });
+  });*/
 
   //Serve Static Content
   /*const app = express();
