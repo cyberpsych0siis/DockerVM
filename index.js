@@ -1,11 +1,18 @@
 const Docker = require("dockerode");
-const dockerClient = new Docker({socketPath: "/var/run/docker.sock"});
+const dockerClient = new Docker({
+  socketPath: "/var/run/docker.sock",
+  version: 'v1.25'
+});
+
 const WebSocketServer = require('ws').Server;
 const websocketStream = require('websocket-stream');
-const express = require("express");
-const expressStatic = require("express-static");
 const http = require("http");
 const { parse } = require("url");
+
+const express = require("express");
+const expressStatic = require("express-static");
+//const http = require("http");
+//const { parse } = require("url");
 const process = require("process");
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
@@ -15,10 +22,10 @@ class DockerClient {
   constructor(options = {
 
     //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
-    host: process.env.DOCKER_HOST ?? '/var/run/docker.sock',
+    host: /*process.env.DOCKER_REMOTE_HOST ?? */'/var/run/docker.sock',
 
     //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
-    image: process.env.DOCKER_IMAGE ?? 'ubuntu',
+    image: process.env.DOCKER_IMAGE ?? 'alpine',
 
     //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
     bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
@@ -32,6 +39,8 @@ class DockerClient {
     console.assert(options.websocket != null, "options.websocket can't be null!");
     this.options = options;
 
+    this.dockerClient = new Docker({socketPath: options.host});
+
     //options.websocket.on('open', () => {
     console.log("[WebSocket] connection opened");
 
@@ -44,9 +53,6 @@ class DockerClient {
     .on('close', err => {
       console.error("[WebSocket] closing because of " + err);
         this.stop()
-        .then(() => {
-          console.log("stop");
-        })
         .catch((err) => {
           console.error(err);
         })
@@ -64,9 +70,10 @@ class DockerClient {
       AttachStdin: false,
       AttachStdout: true,
       AttachStderr: true,
-      Tty: false,
-      Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd],
-      OpenStdin: false,
+      Tty: true,
+//      Cmd: ['echo', 'Hello World', this.options.bootstrapCmd],
+      Cmd: 'echo Hello World',
+      OpenStdin: true,
       StdinOnce: false
     });
   }
@@ -129,7 +136,7 @@ class DockerClient {
   //our http server which handles websocket proxy and static
   const server = app.listen(process.env.WEBSOCKET_PORT ?? 8085, () => {console.log("Listening")});
   server.on('upgrade', (request, socket, head) => {
-    console.log(request.url);
+    //console.log(request.url);
     let { path } = parse(request.url);
 
     console.log(path);
