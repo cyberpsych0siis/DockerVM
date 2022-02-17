@@ -106,7 +106,7 @@ class DockerClient {
   //app.use(httpServer);
 
   //instanciate a new http server
-  const httpServer = http.createServer();
+  const httpServer = http.createServer(app);
 
   //instantiate a new WebSocketServer
   const wss = new WebSocketServer({
@@ -118,6 +118,9 @@ class DockerClient {
     console.log("New Connection", ws);
     let dClient = new DockerClient({
       websocket: ws
+    });
+    ws.on('close', () => {
+      console.log('goodbye');
     });
   });
 
