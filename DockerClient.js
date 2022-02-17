@@ -79,7 +79,9 @@ class DockerClient {
     }
 
     async remove() {
-        return await this.docker.remove();
+        if (this.docker != null) {
+          return await this.docker.remove();
+        }
     }
 
     //pipes our docker output stream to the websocket
@@ -94,4 +96,4 @@ class DockerClient {
     }
 }
 
-module.exports.default = DockerClient;
+module.exports = DockerClient;

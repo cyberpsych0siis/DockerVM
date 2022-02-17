@@ -10,6 +10,10 @@ function createSocket() {
     let logElem = document.getElementById("log");
     logElem.innerText += data.data + "\n";
   }
+
+  s.onerror = err => {
+    console.error(err);
+  }
 }
 
 function connect() {
