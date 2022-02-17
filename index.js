@@ -37,19 +37,21 @@ class DockerClient {
       console.log("[WebSocket] connection opened");
 
       //we got a containerId in the options object, connect to it instead of creating a new container
-      let container = (this.options.containerId !== null) ? this.getContainer(this.options.containerId) : this.createContainer();
-
-      //when container got created start it and attach the websocket to it
-      container.then(container => {
+//      let container = (this.options.containerId !== null) ? this.getContainer(this.options.containerId) ?? (function(){
+//  console.log("Hello");
+//})(): this.createContainer();
+      this.createContainer().then(container => {
         this.docker = container;
-
-        try {
-          this.startContainer();
-//          this.attach();
-        } catch (e) {
-          options.websocket.send(e.getMessage());
-          console.error(e);
-        }
+        this.docker.start();
+        //try {
+          //this.startContainer().then((container) => {
+            //this.docker = container;
+          //});
+          this.attach();
+//        } catch (e) {
+//          options.websocket.send(e.getMessage());
+//          console.error(e);
+//        }
       });
     //})
     options.websocket.on('error', err => {
@@ -63,7 +65,7 @@ class DockerClient {
     });
   }
 
-  async createContainer() {
+  createContainer() {
     return dockerClient.createContainer({
       Image: this.options.image,
       AttachStdin: true,
@@ -82,18 +84,18 @@ class DockerClient {
   }
 
   startContainer() {
-    if (this.docker != null) {
+//    if (this.docker != null) {
       this.docker.start();
-    } else throw new Error("Container was null");
+  //  } else throw new Error("Container was null");
   }
 
   attach() {
-    if (this.docker != null && this.options.ws != null) {
+    //if (this.docker != null && this.options.ws != null) {
       this.docker.attach({stream: true, stdout: true, stderr: true}, function (err, stream) {
         console.log("attaching to container");
         stream.pipe(websocketStream(this.options.websocket));
       });
-    } else throw new Error("Either docker wasn't ready or the websocket object was null");
+    //} else throw new Error("Either docker wasn't ready or the websocket object was null");
   }
 }
 
