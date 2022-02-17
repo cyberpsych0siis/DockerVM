@@ -1,3 +1,21 @@
-window.onload = () => {
-  let socket = new WebSocket("ws://192.168.178.27:8085");
+/*window.onload = () => {
+  createSocket();
+}*/
+
+function createSocket() {
+  let s = new WebSocket("ws://" + location.host + "/socket");
+
+  s.onmessage = data => {
+    console.log(data);
+    let logElem = document.getElementById("log");
+    logElem.innerText += data.data + "\n";
+  }
+
+  s.onerror = err => {
+    console.error(err);
+  }
+}
+
+function connect() {
+  createSocket();
 }

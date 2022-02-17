@@ -1,17 +1,19 @@
 {
   "name": "docker-vm",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
     "dockerode": "^3.3.1",
     "express": "^4.17.2",
     "express-static": "^1.2.6",
+    "morgan": "^1.10.0",
     "websocket-stream": "^5.5.2",
     "ws": "^8.5.0"
   },
   "scripts": {
-    "start": "npx nodemon --inspect=0.0.0.0 ."
+    "start": "npx nodemon --inspect=0.0.0.0 .",
+    "testExec": "node test.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
