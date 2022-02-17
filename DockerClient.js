@@ -11,7 +11,7 @@ class DockerClient {
     constructor(options = {
 
         //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
-        host: /*process.env.DOCKER_REMOTE_HOST ?? */'/var/run/docker.sock',
+        host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
 
         //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
         image: process.env.DOCKER_IMAGE ?? 'alpine',
@@ -58,8 +58,8 @@ class DockerClient {
             AttachStdout: true,
             AttachStderr: true,
             Tty: true,
-            //      Cmd: ['echo', 'Hello World', this.options.bootstrapCmd],
-            Cmd: 'echo Hello World',
+            Cmd: this.options.bootstrapCmd,
+            //Cmd: 'echo Hello World',
             OpenStdin: true,
             StdinOnce: false
         });
