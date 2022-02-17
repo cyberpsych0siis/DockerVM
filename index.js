@@ -43,11 +43,12 @@ const DockerClient = require("./DockerClient.js");
   });
 
   //our http server which handles websocket proxy and static
-  const server = app.listen(process.env.WEBSOCKET_PORT ?? 8085, () => { console.log("Listening") });
+  const PORT = process.env.WEBSOCKET_PORT ?? 8085;
+  const server = app.listen(PORT, () => { console.log("[WebSocket] Listening to port " + PORT) });
   server.on('upgrade', (request, socket, head) => {
     let { path } = parse(request.url);
 
-    console.log(request.headers);
+    //console.log(request.headers);
 
     if (validateSession(request.headers.cookie)) {
       if (path === "/socket") {

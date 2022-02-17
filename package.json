@@ -12,7 +12,8 @@
     "ws": "^8.5.0"
   },
   "scripts": {
-    "start": "npx nodemon --inspect=0.0.0.0 ."
+    "start": "npx nodemon --inspect=0.0.0.0 .",
+    "testExec": "node test.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
