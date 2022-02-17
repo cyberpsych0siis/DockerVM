@@ -26,36 +26,35 @@ class DockerClient {
     //the websocket that should be used for communication
     websocket: null,
 
-    //the container id that should be used instead of a created container
+    //the container id that should be used instead of a created container - UNUSED
     containerId: null
   }) {
     console.assert(options.websocket != null, "options.websocket can't be null!");
-    // console.log(options.host);
     this.options = options;
 
     //options.websocket.on('open', () => {
-      console.log("[WebSocket] connection opened");
+    console.log("[WebSocket] connection opened");
 
-      //we got a containerId in the options object, connect to it instead of creating a new container
-//      let container = (this.options.containerId !== null) ? this.getContainer(this.options.containerId) ?? (function(){
-/*      this.createContainer().then(async container => {
-        console.log("container creation succeeded");
-        this.docker = container;
-        console.log(await container.stats());
-        this.attach();
-        //container.start();
-      });*/
-    //let c = this.createContainer();
-    //console.log(c);
-    //})
+    //if our webserver emits an error, print it to stderr
     options.websocket.on('error', err => {
       console.error(err);
-    }).on('close', err => {
+    })
+
+    //if the client himself closes the connection, clean up, stop and remove the container
+    .on('close', err => {
       console.error("[WebSocket] closing because of " + err);
-      if (this.docker != null) {
-        this.docker.stop();
-        this.docker.remove();
-      }
+        this.stop()
+        .then(() => {
+          console.log("stop");
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          //options.websocket.close();
+          //options.websocket.send("closing");
+//        console.log("closing");
+        });
     });
   }
 
@@ -65,26 +64,39 @@ class DockerClient {
       AttachStdin: false,
       AttachStdout: true,
       AttachStderr: true,
-      Tty: true,
+      Tty: false,
       Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd],
       OpenStdin: false,
       StdinOnce: false
     });
   }
 
-  async start() {
-    let container = await this.createContainer();
-    return await container.start();
+  async stop() {
+    if (this.docker != null) {
+      await this.docker.stop();
+    } else {
+      throw new Error("Container is not initialized");
+    }
   }
 
+  async start() {
+    this.docker = await this.createContainer();
+    return await this.docker.start();
+  }
+
+  async remove() {
+    return await this.docker.remove();
+  }
+
+  //pipes our docker output stream to the websocket
   attach(pipeStream) {
-    //if (this.docker != null && this.options.ws != null) {
+    if (this.docker != null && this.options.ws != null) {
       this.docker.attach({stream: true, stdout: true, stderr: true}, (err, stream) => {
         console.log("attaching to container");
         //console.log(stream);
         stream.pipe(pipeStream);
       });
-    //} else throw new Error("Either docker wasn't ready or the websocket object was null");
+    } else throw new Error("Docker or websocket is null");
   }
 }
 
@@ -104,26 +116,28 @@ class DockerClient {
       websocket: ws
     });
 
-    try {
-      dClient.start().then((container) => {
-        //container.attach(websocketStream(ws));
-//        container.attach(
-      });
-    } catch (e) {
-      console.error(e);
-      ws.send(e);
-    }
-
-    ws.on('close', () => {
-      console.log('goodbye');
+    dClient.start().then((container) => {
+      container.attach(websocketStream(ws));
+    })
+    .catch((err) => {
+      console.error(err);
+      ws.send(err.message);
+      dClient.remove();
     });
   });
 
+  //our http server which handles websocket proxy and static
   const server = app.listen(process.env.WEBSOCKET_PORT ?? 8085, () => {console.log("Listening")});
-    server.on('upgrade', (request, socket, head) => {
+  server.on('upgrade', (request, socket, head) => {
+    console.log(request.url);
+    let { path } = parse(request.url);
+
+    console.log(path);
+    if (path === "/socket") {
       wss.handleUpgrade(request, socket, head, socket => {
-      //if the httpServer gets an 'upgrade' event we need to switch our connection
+        //if the httpServer gets an 'upgrade' event we need to switch our connection
         wss.emit('connection', socket, request);
       });
-    });
+    }
+  });
 })();
