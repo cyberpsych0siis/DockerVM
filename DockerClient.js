@@ -32,15 +32,17 @@ class DockerClient {
     }
 
     createContainer() {
+        console.log("cmd: " + this.options.bootstrapCmd);
         return dockerClient.createContainer({
             Image: this.options.image,
             AttachStdin: false,
-            AttachStdout: true,
-            AttachStderr: true,
-            Tty: true,
-            Cmd: this.options.bootstrapCmd,
+            AttachStdout: false,
+            AttachStderr: false,
+            Tty: false,
+            // Cmd: ['/bin/sh', '-c', 'echo "Hello world"'],
+            Cmd: ['ls', '-la'],
             //Cmd: 'echo Hello World',
-            OpenStdin: true,
+            OpenStdin: false,
             StdinOnce: false
         });
     }
@@ -55,7 +57,8 @@ class DockerClient {
 
     async start() {
         this.docker = await this.createContainer();
-        return await this.docker.start();
+        console.log(await this.docker.inspect());
+        return this.docker.start();
     }
 
     /**

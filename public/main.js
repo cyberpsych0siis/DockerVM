@@ -12,7 +12,7 @@ function createSocket() {
   }
 
   s.onerror = err => {
-    console.error(err);
+    console.error(err.data);
   }
 }
 

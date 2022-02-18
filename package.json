@@ -12,10 +12,12 @@
     "ws": "^8.5.0"
   },
   "scripts": {
-    "start": "npx nodemon --inspect=0.0.0.0 .",
-    "testExec": "node test.js"
+    "test": "npx jasmine",
+    "prod": "node .",
+    "start": "npx nodemon --inspect=0.0.0.0 ."
   },
   "devDependencies": {
+    "jasmine": "^4.0.2",
     "nodemon": "^2.0.15"
   }
 }
