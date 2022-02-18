@@ -1,5 +1,5 @@
 const WebSocketServer = require('ws').Server;
-const websocketStream = require('websocket-stream');
+const websocketStream = require('websocket-stream/stream');
 const http = require("http");
 const logger = require("morgan");
 const { parse } = require("url");
@@ -9,6 +9,8 @@ const expressStatic = require("express-static");
 const process = require("process");
 
 const DockerClient = require("./DockerClient.js");
+
+const fs = require("fs");
 
 (function () {
   const app = express();
@@ -67,9 +69,9 @@ const DockerClient = require("./DockerClient.js");
         console.log("[WebSocket Client] " + data);
       })
 
-    dClient.start().then((container) => {
+    dClient.start(websocketStream(ws))/* .then((container) => {
       dClient.attach(websocketStream(ws));
-    })
+    }) */
       .catch((err) => {
         dClient.stop();
         dClient.remove();
@@ -87,7 +89,7 @@ const DockerClient = require("./DockerClient.js");
     let { path } = parse(request.url);
 
     if (validateSession(request.headers.cookie)) {
-      if (path === "/socket") {
+      if (path === "/socket" || path === "/") {
         wss.handleUpgrade(request, socket, head, socket => {
           //if the httpServer gets an 'upgrade' event we need to switch our connection
           wss.emit('connection', socket, request);

@@ -5,10 +5,10 @@
 function createSocket() {
   let s = new WebSocket("ws://" + location.host + "/socket");
 
-  s.onmessage = data => {
+  s.onmessage = async data => {
     console.log(data);
     let logElem = document.getElementById("log");
-    logElem.innerText += data.data + "\n";
+    logElem.innerText += await data.data.text() + "\n";
   }
 
   s.onerror = err => {
