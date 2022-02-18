@@ -15,7 +15,7 @@ const DockerClient = require("./DockerClient.js");
   app.use(logger('dev'));
 
   app.use("/health", (req, res) => {
-    res.send({status: true});
+    res.send({ status: true });
   });
   app.use("/", expressStatic('public'));
 
@@ -31,11 +31,10 @@ const DockerClient = require("./DockerClient.js");
   //on new WebSocketServer connection, connect websocket with a new DockerClient instance
   wss.on('connection', function connect(ws) {
     console.log("New Connection");
-    let dClient = new DockerClient({
-      websocket: ws
-    });
+    let dClient = new DockerClient();
 
     //options.websocket.on('open', () => {
+    ws.send("[WebSocket] connection opened");
     console.log("[WebSocket] connection opened");
 
     //if our webserver emits an error, print it to stderr
@@ -46,16 +45,22 @@ const DockerClient = require("./DockerClient.js");
       .on('close', err => {
         console.error("[WebSocket] closing because of " + err);
 
+        let auxContainer;
+
         dClient.stop()
-        .then((container) => {
-          return container.remove();
-        })
+          .then((container) => {
+            auxContainer = container;
+          })
           .catch((err) => {
+            ws.send("[WebSocket] connection closed");
             console.error(err);
           })
           .finally(() => {
             //cleanup
-            // dClient.remove();
+            dClient.remove();
+            // auxContainer.stop();
+            // auxContainer.remove();
+            // container.remove();
           });
       })
       .on("message", (data) => {
@@ -63,9 +68,10 @@ const DockerClient = require("./DockerClient.js");
       })
 
     dClient.start().then((container) => {
-      container.attach(websocketStream(ws));
+      dClient.attach(websocketStream(ws));
     })
       .catch((err) => {
+        dClient.stop();
         dClient.remove();
         console.error(err);
         ws.send(err.toString());
