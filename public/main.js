@@ -2,13 +2,25 @@
   createSocket();
 }*/
 
+var socket;
+
 function createSocket() {
   let s = new WebSocket("ws://" + location.host + "/socket");
 
   s.onmessage = async data => {
     console.log(data);
     let logElem = document.getElementById("log");
-    logElem.innerText += await data.data.text() + "\n";
+    let msg = "no message";
+    switch (typeof await data.data) {
+      case "object":
+        //is blob
+        msg = await data.data.text();
+        break;
+      case "string":
+        msg = await data.data.toString(); //you can never be sure
+        break;
+    }
+    logElem.innerText += msg + "\n";
   }
 
   s.onerror = err => {
@@ -26,5 +38,9 @@ function createSocket() {
 }
 
 function connect() {
-  createSocket();
+  socket = createSocket();
+}
+
+function send(cmd) {
+  socket.send(cmd);
 }

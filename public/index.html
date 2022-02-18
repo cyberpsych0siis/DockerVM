@@ -2,11 +2,18 @@
 <head>
 <title>Websocket Test</title>
 <script src="main.js"></script>
+<script>
+function sendMessage() {
+  let msg = document.getElementById("msg").value;
+  send(msg);
+}
+</script>
 </head>
 
 <body>
   <h1>It works! :)</h1>
   <p><input type='button' onclick='connect()' value='Connect'></p>
+  <p><input type='text' id='msg'><input type='button' onclick='sendMessage()' value='Send'></p>
 
   <pre id="log"></pre>
 </body>
