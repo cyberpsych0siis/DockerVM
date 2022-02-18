@@ -25,30 +25,10 @@ class DockerClient {
         //the container id that should be used instead of a created container - UNUSED
         containerId: null
     }) {
-        console.assert(options.websocket != null, "options.websocket can't be null!");
+        // console.assert(options.websocket != null, "options.websocket can't be null!");
         this.options = options;
 
         this.dockerClient = new Docker({ socketPath: options.host });
-
-        //options.websocket.on('open', () => {
-        console.log("[WebSocket] connection opened");
-
-        //if our webserver emits an error, print it to stderr
-        options.websocket.on('error', err => {
-            console.error(err);
-        })
-
-            //if the client himself closes the connection, clean up, stop and remove the container
-            .on('close', err => {
-                console.error("[WebSocket] closing because of " + err);
-                this.stop()
-                    .catch((err) => {
-                        console.error(err);
-                    })
-                    .finally(() => {
-                        //cleanup
-                    });
-            });
     }
 
     createContainer() {
@@ -86,13 +66,13 @@ class DockerClient {
 
     //pipes our docker output stream to the websocket
     attach(pipeStream) {
-        if (this.docker != null && this.options.ws != null) {
+        if (this.docker != null) {
             this.docker.attach({ stream: true, stdout: true, stderr: true }, (err, stream) => {
                 console.log("attaching to container");
                 //console.log(stream);
                 stream.pipe(pipeStream);
             });
-        } else throw new Error("Docker or websocket is null");
+        } else throw new Error("Docker Container is not running");
     }
 }
 

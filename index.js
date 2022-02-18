@@ -32,6 +32,29 @@ const DockerClient = require("./DockerClient.js");
       websocket: ws
     });
 
+    //options.websocket.on('open', () => {
+    console.log("[WebSocket] connection opened");
+
+    //if our webserver emits an error, print it to stderr
+    ws.on('error', err => {
+      console.error(err);
+    })
+      //if the client himself closes the connection, clean up, stop and remove the container
+      .on('close', err => {
+        console.error("[WebSocket] closing because of " + err);
+        dClient.stop()
+        .then((container) => {
+          return container.remove();
+        })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            //cleanup
+            // dClient.remove();
+          });
+      });
+
     dClient.start().then((container) => {
       container.attach(websocketStream(ws));
     })
@@ -59,9 +82,9 @@ const DockerClient = require("./DockerClient.js");
       }
     } else {
       socket.write('HTTP/1.1 401 Web Socket Protocol Handshake\r\n' +
-                   'Upgrade: WebSocket\r\n' +
-                     'Connection: Upgrade\r\n' +
-                     '\r\n');
+        'Upgrade: WebSocket\r\n' +
+        'Connection: Upgrade\r\n' +
+        '\r\n');
       //socket.close();
       socket.destroy();
       return;
