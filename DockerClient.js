@@ -14,7 +14,7 @@ class DockerClient {
         host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
 
         //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
-        image: process.env.DOCKER_IMAGE ?? 'alpine',
+        image: process.env.DOCKER_IMAGE ?? 'jarvis/testvm',
 
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
@@ -31,7 +31,7 @@ class DockerClient {
         this.dockerClient = new Docker({ socketPath: options.host });
     }
 
-    createContainer() {
+    async createContainer() {
         console.log("cmd: " + this.options.bootstrapCmd);
         return dockerClient.createContainer({
             Image: this.options.image,

@@ -14,6 +14,9 @@ const DockerClient = require("./DockerClient.js");
   const app = express();
   app.use(logger('dev'));
 
+  app.use("/health", (req, res) => {
+    res.send({status: true});
+  });
   app.use("/", expressStatic('public'));
 
   const wss = new WebSocketServer({
@@ -65,17 +68,17 @@ const DockerClient = require("./DockerClient.js");
       .catch((err) => {
         dClient.remove();
         console.error(err);
-        ws.send(err.message);
+        ws.send(err.toString());
       });
   });
 
   //our http server which handles websocket proxy and static
   const PORT = process.env.WEBSOCKET_PORT ?? 8085;
   const server = app.listen(PORT, () => { console.log("[WebSocket] Listening to port " + PORT) });
+
+  //If our HTTP-Server gets an upgrade check the authorization and if success continue
   server.on('upgrade', (request, socket, head) => {
     let { path } = parse(request.url);
-
-    //console.log(request.headers);
 
     if (validateSession(request.headers.cookie)) {
       if (path === "/socket") {
@@ -85,13 +88,8 @@ const DockerClient = require("./DockerClient.js");
         });
       }
     } else {
-
-      socket.write('HTTP/1.1 403 Forbidden\r\n');
-/*       socket.write('HTTP/1.1 401 Web Socket Protocol Handshake\r\n' +
-        'Upgrade: WebSocket\r\n' +
-        'Connection: Upgrade\r\n' +
-        '\r\n'); */
-      //socket.close();
+      socket.write('HTTP/1.1 401 Unauthorized\r\n');
+      console.log("unauthorized");
       socket.destroy();
       return;
     }

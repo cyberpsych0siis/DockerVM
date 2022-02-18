@@ -8,7 +8,7 @@ beforeEach(function() {
 
 describe("DockerClient", () => {
 
-/*     it ("should start a container" function() {
+    it ("should start a container", function() {
         expect(client.connect())
-    }) */
+    });
 });
