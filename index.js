@@ -42,6 +42,7 @@ const DockerClient = require("./DockerClient.js");
       //if the client himself closes the connection, clean up, stop and remove the container
       .on('close', err => {
         console.error("[WebSocket] closing because of " + err);
+
         dClient.stop()
         .then((container) => {
           return container.remove();
@@ -53,7 +54,10 @@ const DockerClient = require("./DockerClient.js");
             //cleanup
             // dClient.remove();
           });
-      });
+      })
+      .on("message", (data) => {
+        console.log("[WebSocket Client] " + data);
+      })
 
     dClient.start().then((container) => {
       container.attach(websocketStream(ws));
@@ -81,10 +85,12 @@ const DockerClient = require("./DockerClient.js");
         });
       }
     } else {
-      socket.write('HTTP/1.1 401 Web Socket Protocol Handshake\r\n' +
+
+      socket.write('HTTP/1.1 403 Forbidden\r\n');
+/*       socket.write('HTTP/1.1 401 Web Socket Protocol Handshake\r\n' +
         'Upgrade: WebSocket\r\n' +
         'Connection: Upgrade\r\n' +
-        '\r\n');
+        '\r\n'); */
       //socket.close();
       socket.destroy();
       return;

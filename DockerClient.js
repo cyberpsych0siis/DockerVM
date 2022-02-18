@@ -58,6 +58,11 @@ class DockerClient {
         return await this.docker.start();
     }
 
+    /**
+     * 
+     * @deprecated
+     * @returns 
+     */
     async remove() {
         if (this.docker != null) {
           return await this.docker.remove();
