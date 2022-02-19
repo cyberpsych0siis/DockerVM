@@ -48,7 +48,7 @@ class DockerClient {
     async createContainer() {
         // console.log("cmd: " + this.options.bootstrapCmd);
         // let addr = ;
-        console.log("[DockerClient]Attaching new Container to " + addr)
+        console.log("[DockerClient] Attaching new Container to " + this.addr)
         return this.dockerClient.createContainer({
             Image: this.options.image,
             AttachStdin: false,
