@@ -42,7 +42,9 @@ class DockerClient {
     }
 
     async createContainer() {
-        console.log("cmd: " + this.options.bootstrapCmd);
+        // console.log("cmd: " + this.options.bootstrapCmd);
+        let addr = `${uuid()}.${this.options.subdomain}`;
+        console.log("[DockerClient]Attaching new Container to " + addr)
         return this.dockerClient.createContainer({
             Image: this.options.image,
             AttachStdin: false,
@@ -52,7 +54,7 @@ class DockerClient {
             OpenStdin: false,
             StdinOnce: false,
             Env: [
-                `VIRTUAL_HOST=${uuid()}.${this.options.subdomain}`      //compatible with jwilder/nginx-proxy - test pls
+                `VIRTUAL_HOST=${addr}`      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
             ]
         });
