@@ -59,15 +59,15 @@ class DockerClient {
                 `VIRTUAL_HOST=${this.addr}`,      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
             ],
-            Labels: [
+            Labels: {
                 // tcp:
-        // `services.my-service.loadBalancer.servers.address=<private-ip-server-1>:<private-port-server-1>`
-                "traefik.enable=true",
-                "traefik.port=" + this.options.exposedPort,
-                "traefik.tcp.routers." + this.name + ".entrypoints=ssh",
-                "traefik.tcp.routers." + this.name + ".rule=Host:" + this.addr,
+                // `services.my-service.loadBalancer.servers.address=<private-ip-server-1>:<private-port-server-1>`
+                "traefik.enable": "true",
+                "traefik.port": this.options.exposedPort,
+                ["traefik.tcp.routers." + this.name + ".entrypoints"]: "ssh",
+                ["traefik.tcp.routers." + this.name + ".rule"]: "Host(`" + this.addr + "`)"
                 // "traefik.tcp.routers." + this.name + ".service=",
-            ],
+            },
             NetworkingConfig: {
                 "EndpointsConfig": {
                     [this.options.networkId]: {
