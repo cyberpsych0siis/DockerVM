@@ -22,6 +22,9 @@ class DockerClient {
 
         //under which subdomain should the containers be accessible?
         subdomain: process.env.SUBDOMAIN ?? "s.rillo5000.com",
+
+        //what port should be exposed?
+        exposedPort: process.env.EXPOSED_PORT ?? 22,
     
         //the websocket that should be used for communication
         websocket: null,
@@ -50,6 +53,7 @@ class DockerClient {
             StdinOnce: false,
             Env: [
                 `VIRTUAL_HOST=${uuid()}.${this.options.subdomain}`      //compatible with jwilder/nginx-proxy - test pls
+                `VIRTUAL_PORT=${this.options.exposedPort}`
             ]
         });
     }
