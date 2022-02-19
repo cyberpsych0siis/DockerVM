@@ -6,5 +6,5 @@ WORKDIR /app
 ENV BOOTSTRAP="tail -f /dev/random"
 COPY . .
 RUN yarn
-CMD ["yarn", "start"]
+CMD ["yarn", "prod"]
 EXPOSE 8085

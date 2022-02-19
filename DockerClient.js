@@ -1,11 +1,12 @@
 const Docker = require("dockerode");
+const { uuid } = require("uuidv4");
 /* const dockerClient = new Docker(/*{
     socketPath: "/var/run/docker.sock",
     version: 'v1.25'
 }*); */
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
-const BOOTSTRAP_NOT_DEFINED = "bash -i";//"echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
+const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
 
 class DockerClient {
 
@@ -14,10 +15,13 @@ class DockerClient {
         host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
     
         //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
-        image: process.env.DOCKER_IMAGE ?? 'archlinux',
+        image: process.env.DOCKER_IMAGE ?? 'ubuntu',
     
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
+
+        //under which subdomain should the containers be accessible?
+        subdomain: process.env.SUBDOMAIN ?? "s.rillo5000.com",
     
         //the websocket that should be used for communication
         websocket: null,
@@ -42,9 +46,11 @@ class DockerClient {
             AttachStdout: false,
             AttachStderr: false,
             Tty: true,
-            // Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd],
             OpenStdin: false,
-            StdinOnce: false
+            StdinOnce: false,
+            Env: [
+                `VIRTUAL_HOST=${uuid()}.${this.options.subdomain}`      //compatible with jwilder/nginx-proxy - test pls
+            ]
         });
     }
 
@@ -58,20 +64,27 @@ class DockerClient {
 
     async start(pipe) {
         this.docker = await this.createContainer();
-        this.container.exec({Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd ], AttachStdin: true, AttachStdout}, function(err, exec) {
-            exec.start({hijack: true, stdin: true}, function(err, stream) {
-                pipe.pipe(stream);
-                this.docker.modem.demuxStream(stream, pipe, process.stderr);
-            });
-        })
+        return this.docker.start((data) => {
+            this.docker.exec({Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd ], AttachStdin: true, AttachStdout: true}, (err, exec) => {
+                if (err) throw err;
+
+//                console.log(this.options.bootstrapCmd);
+//		console.log(exec);
+
+                exec.start({hijack: true, stdin: true}, (err, stream) => {
+                    pipe.pipe(stream);
+                    this.docker.modem.demuxStream(stream, pipe, process.stderr);
+                });
+            })
+        });
         // console.log(await this.docker.inspect());
-        return await this.docker.start();
+        // return await this.docker.start();
     }
 
     /**
-     * 
+     *
      * @deprecated
-     * @returns 
+     * @returns
      */
     async remove() {
         if (this.docker != null) {
@@ -80,6 +93,10 @@ class DockerClient {
     }
 
     //pipes our docker output stream to the websocket
+    /**
+     *
+     * @deprecated
+     */
     attach(pipeStreamOut, pipeStreamIn) {
         if (this.docker != null) {
             this.docker.attach({ stream: true, stdout: true, stderr: true, stdin: true }, (err, stream) => {
@@ -87,7 +104,7 @@ class DockerClient {
                 // stream.pipe(pipeStreamOut);
                 // stream.pipe(process.stdout);
                 process.stdin.pipe(stream);
-                this.docker.modem.demuxStream(stream, process.stdout, process.stderr);
+                this.docker.modem.demuxStream(stream, pipe, pipe);
                 // this.docker.
                 // pipeStreamOut.pipe(());
             });
