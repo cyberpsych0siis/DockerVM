@@ -1,4 +1,5 @@
 const Docker = require("dockerode");
+const { uuid } = require("uuidv4");
 /* const dockerClient = new Docker(/*{
     socketPath: "/var/run/docker.sock",
     version: 'v1.25'
@@ -18,6 +19,9 @@ class DockerClient {
     
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
+
+        //under which subdomain should the containers be accessible?
+        subdomain: process.env.SUBDOMAIN ?? "s.rillo5000.com",
     
         //the websocket that should be used for communication
         websocket: null,
@@ -43,7 +47,10 @@ class DockerClient {
             AttachStderr: false,
             Tty: true,
             OpenStdin: false,
-            StdinOnce: false
+            StdinOnce: false,
+            Env: [
+                `VIRTUAL_HOST=${uuid()}.${this.options.subdomain}`      //compatible with jwilder/nginx-proxy - test pls
+            ]
         });
     }
 
