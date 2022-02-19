@@ -1,9 +1,5 @@
 const Docker = require("dockerode");
 const { uuid } = require("uuidv4");
-/* const dockerClient = new Docker(/*{
-    socketPath: "/var/run/docker.sock",
-    version: 'v1.25'
-}*); */
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
@@ -43,6 +39,8 @@ class DockerClient {
 
         this.dockerClient = new Docker();
         this.addr = `${uuid()}.${this.options.subdomain}`;
+        this.name = this.addr.split["-"][0];
+        console.log(this.name);
     }
 
     async createContainer() {
@@ -60,6 +58,15 @@ class DockerClient {
             Env: [
                 `VIRTUAL_HOST=${this.addr}`,      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
+            ],
+            Labels: [
+                // tcp:
+        // `services.my-service.loadBalancer.servers.address=<private-ip-server-1>:<private-port-server-1>`
+                "traefik.enable=true",
+                "traefik.port=" + this.options.exposedPort,
+                "traefik.tcp.routers." + this.name + ".entrypoints=ssh",
+                "traefik.tcp.routers." + this.name + ".rule=Host(`" + this.addr + "`)",
+                // "traefik.tcp.routers." + this.name + ".service=",
             ],
             NetworkingConfig: {
                 "EndpointsConfig": {
