@@ -25,6 +25,9 @@ class DockerClient {
 
         //what port should be exposed?
         exposedPort: process.env.EXPOSED_PORT ?? 22,
+
+        //what network should the new container be attached to?
+        networkId: process.env.NETWORK_ID ?? "nginx",
     
         //the websocket that should be used for communication
         websocket: null,
@@ -56,7 +59,14 @@ class DockerClient {
             Env: [
                 `VIRTUAL_HOST=${addr}`,      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
-            ]
+            ],
+            NetworkingConfig: {
+                "EndpointsConfig": {
+                    [this.options.networkId]: {
+
+                    }
+                }
+            }
         });
     }
 
