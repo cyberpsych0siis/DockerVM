@@ -39,7 +39,7 @@ class DockerClient {
 
         this.dockerClient = new Docker();
         this.addr = `${uuid()}.${this.options.subdomain}`;
-        this.name = this.addr.split["-"][0];
+        this.name = this.addr.split("-")[0];
         console.log(this.name);
     }
 
