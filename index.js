@@ -72,6 +72,9 @@ const fs = require("fs");
     dClient.start(websocketStream(ws))/* .then((container) => {
       dClient.attach(websocketStream(ws));
     }) */
+    .then(() => {
+      ws.send("New Connection: " + dClient.addr)
+    })
       .catch((err) => {
         dClient.stop();
         dClient.remove();
