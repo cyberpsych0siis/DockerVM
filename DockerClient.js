@@ -54,7 +54,7 @@ class DockerClient {
             OpenStdin: false,
             StdinOnce: false,
             Env: [
-                `VIRTUAL_HOST=${addr}`      //compatible with jwilder/nginx-proxy - test pls
+                `VIRTUAL_HOST=${addr}`,      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
             ]
         });
