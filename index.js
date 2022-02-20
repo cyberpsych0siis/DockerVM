@@ -16,7 +16,15 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
 
 (function () {
   const app = express();
-  app.use(logger('dev'));
+  app.use(logger('dev', {
+    skip: function (req, res) {
+      if (req.url == '/health') {
+          return true;
+      } else {
+          return false;
+      }
+  }
+  }));
 
   app.use("/health", (req, res) => {
     res.send({ status: true });
@@ -52,10 +60,8 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
   //on new WebSocketServer connection, connect websocket with a new DockerClient instance
   wss.on('connection', function connect(ws) {
     console.log("[WebSocket] New Connection");
-    // let dClient = new DockerClient();
     let dClient = null;
 
-    //options.websocket.on('open', () => {
     ws.send("Connection established");
     console.log("[WebSocket] connection opened");
 
@@ -104,7 +110,6 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
         } catch (e) {
           ws.send(e.toString());
         }
-        // }
       });
   });
 
