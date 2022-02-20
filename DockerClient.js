@@ -10,17 +10,11 @@ class DockerClient {
         //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
         host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
 
-        //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
-        // image: process.env.DOCKER_IMAGE ?? 'ubuntu',
-
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
 
         //under which subdomain should the containers be accessible?
         subdomain: process.env.SUBDOMAIN ?? "s.rillo5000.com",
-
-        //what port should be exposed?
-        exposedPort: process.env.EXPOSED_PORT ?? 22,
 
         //what network should the new container be attached to?
         networkId: process.env.NETWORK_ID ?? "nginx",
@@ -108,4 +102,17 @@ class DockerClient {
     }
 }
 
-module.exports = DockerClient;
+class LabelProvider {
+    /**
+     * Should return options on how the element is connected to the proxy
+     */
+    getProperties(
+        containerName,      //The name of the container (typically the first part of a UUID)
+        reachableAddress    //external address thats used to connect to the client
+        ) {
+        return {}
+    }
+}
+
+module.exports.default = DockerClient;
+module.exports.LabelProvider = LabelProvider;

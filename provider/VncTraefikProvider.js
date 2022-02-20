@@ -1,4 +1,4 @@
-const LabelProvider = require("../LabelProvider.js");
+const { LabelProvider } = require("../DockerClient.js");
 
 module.exports = class VncTraefikProvider extends LabelProvider {
     /**
@@ -9,7 +9,6 @@ module.exports = class VncTraefikProvider extends LabelProvider {
      * @returns Object
      */
     getProperties(containerName, reachableAddress) {
-        console.debug("This method is not implemented yet and returns default values for http service. dont use for now thx");
         return {
             Hostname: containerName,
             Image: "vncserver/lubuntu",

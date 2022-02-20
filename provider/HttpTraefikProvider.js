@@ -1,4 +1,4 @@
-const LabelProvider = require("../LabelProvider.js");
+const { LabelProvider } = require("../DockerClient.js");
 
 module.exports = class HttpTraefikProvider extends LabelProvider {
     /**
