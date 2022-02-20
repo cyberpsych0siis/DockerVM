@@ -9,12 +9,22 @@ const expressStatic = require("express-static");
 const process = require("process");
 
 const DockerClient = require("./DockerClient.js");
+const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
+const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
 
-const fs = require("fs");
+// const fs = require("fs");
 
 (function () {
   const app = express();
-  app.use(logger('dev'));
+  app.use(logger('dev', {
+    skip: function (req, res) {
+      if (req.url == '/health') {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }));
 
   app.use("/health", (req, res) => {
     res.send({ status: true });
@@ -30,13 +40,29 @@ const fs = require("fs");
     return true;
   }
 
+  function getProviderByMessage(msg) {
+    console.log(msg);
+    if (msg == "") throw new Error("Invalid message");
+
+    const s = msg.split(" ");
+    switch (s[1]) {
+      case "http":
+        return new HttpTraefikProvider();
+
+      case "vnc":
+        return new VncTraefikProvider();
+
+      default:
+        throw new Error("Unknown Provider specified");
+    }
+  }
+
   //on new WebSocketServer connection, connect websocket with a new DockerClient instance
   wss.on('connection', function connect(ws) {
-    console.log("New Connection");
-    let dClient = new DockerClient();
+    console.log("[WebSocket] New Connection");
+    let dClient = null;
 
-    //options.websocket.on('open', () => {
-    ws.send("[WebSocket] connection opened");
+    ws.send("Connection established");
     console.log("[WebSocket] connection opened");
 
     //if our webserver emits an error, print it to stderr
@@ -49,32 +75,41 @@ const fs = require("fs");
 
         let auxContainer;
 
-        dClient.stop()
-          .then((container) => {
-            auxContainer = container;
-          })
-          .catch((err) => {
-            ws.send("[WebSocket] connection closed");
-            console.error(err);
-          })
-          .finally(() => {
-            //cleanup
-            dClient.remove();
-          });
+        if (dClient != null) {
+          dClient.stop()
+            .then((container) => {
+              auxContainer = container;
+            })
+            .catch((err) => {
+              ws.send("[WebSocket] connection closed");
+              console.error(err);
+            })
+            .finally(() => {
+              //cleanup
+              dClient.remove();
+            });
+        }
       })
       .on("message", (data) => {
         console.log("[WebSocket Client] " + data);
-      })
 
-    dClient.start(websocketStream(ws))
-    .then(() => {
-      ws.send("New Connection: " + dClient.addr)
-    })
-      .catch((err) => {
-        dClient.stop();
-        dClient.remove();
-        console.error(err);
-        ws.send(err.toString());
+        try {
+          let provider = getProviderByMessage(data.toString());
+          dClient = new DockerClient(provider);
+
+          dClient.start(websocketStream(ws))
+            .then(() => {
+              ws.send("New Connection: " + dClient.addr)
+            })
+            .catch((err) => {
+              dClient.stop();
+              dClient.remove();
+              console.error(err);
+              ws.send(err.toString());
+            });
+        } catch (e) {
+          ws.send(e.toString());
+        }
       });
   });
 
@@ -86,6 +121,7 @@ const fs = require("fs");
   server.on('upgrade', (request, socket, head) => {
     let { path } = parse(request.url);
 
+    //Checks if current connection is authorized
     if (validateSession(request.headers.cookie)) {
       if (path === "/socket" || path === "/") {
         wss.handleUpgrade(request, socket, head, socket => {

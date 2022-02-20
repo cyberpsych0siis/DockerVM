@@ -37,10 +37,22 @@ function createSocket() {
   return s;
 }
 
-function connect() {
+/* function connect() {
   socket = createSocket();
-}
+} */
 
 function send(cmd) {
   socket.send(cmd);
+}
+
+window.onload = () => {
+  socket = createSocket();
+}
+
+function startNginx() {
+  socket.send("start http");
+}
+
+function startVnc() {
+  socket.send("start vnc");
 }
