@@ -44,7 +44,7 @@ const axios = require("axios");
 
     // console.log(fetch);
 
-    const serverResponse = await axios.post(process.env.AUTHENTICATION_ROUTE ?? "/auth", {token: token});
+    const serverResponse = await axios.post(process.env.AUTHENTICATION_ROUTE, {token: token});
     // const data = await serverResponse.json();
     console.log(serverResponse);
 
