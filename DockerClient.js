@@ -11,7 +11,7 @@ class DockerClient {
         host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
 
         //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
-        image: process.env.DOCKER_IMAGE ?? 'ubuntu',
+        // image: process.env.DOCKER_IMAGE ?? 'ubuntu',
 
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
@@ -49,7 +49,6 @@ class DockerClient {
     async createContainer() {
         console.log("[DockerClient] Attaching new Container to " + this.addr)
         let properties = {
-            Image: this.options.image,
             AttachStdin: false,
             AttachStdout: false,
             AttachStderr: false,
@@ -67,8 +66,7 @@ class DockerClient {
 
         Object.assign(properties, this.provider?.getProperties(
             String(this.name),
-            String(this.addr),
-            String(this.options.exposedPort)
+            String(this.addr)
         ));   //assigns the provider properties to the container properties
 
         console.log(properties);

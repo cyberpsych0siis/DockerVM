@@ -19,11 +19,11 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
   app.use(logger('dev', {
     skip: function (req, res) {
       if (req.url == '/health') {
-          return true;
+        return true;
       } else {
-          return false;
+        return false;
       }
-  }
+    }
   }));
 
   app.use("/health", (req, res) => {
@@ -76,18 +76,18 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
         let auxContainer;
 
         if (dClient != null) {
-        dClient.stop()
-          .then((container) => {
-            auxContainer = container;
-          })
-          .catch((err) => {
-            ws.send("[WebSocket] connection closed");
-            console.error(err);
-          })
-          .finally(() => {
-            //cleanup
-            dClient.remove();
-          });
+          dClient.stop()
+            .then((container) => {
+              auxContainer = container;
+            })
+            .catch((err) => {
+              ws.send("[WebSocket] connection closed");
+              console.error(err);
+            })
+            .finally(() => {
+              //cleanup
+              dClient.remove();
+            });
         }
       })
       .on("message", (data) => {
@@ -96,17 +96,17 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
         try {
           let provider = getProviderByMessage(data.toString());
           dClient = new DockerClient(provider);
-          
+
           dClient.start(websocketStream(ws))
-          .then(() => {
-            ws.send("New Connection: " + dClient.addr)
-          })
-          .catch((err) => {
-            dClient.stop();
-            dClient.remove();
-            console.error(err);
-            ws.send(err.toString());
-          });
+            .then(() => {
+              ws.send("New Connection: " + dClient.addr)
+            })
+            .catch((err) => {
+              dClient.stop();
+              dClient.remove();
+              console.error(err);
+              ws.send(err.toString());
+            });
         } catch (e) {
           ws.send(e.toString());
         }

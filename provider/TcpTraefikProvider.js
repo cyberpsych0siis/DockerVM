@@ -8,12 +8,12 @@ module.exports = class TcpTraefikProvider extends LabelProvider {
      * @param {string} proxyPort 
      * @returns Object
      */
-    getProperties(containerName, reachableAddress, proxyPort) {
+    getProperties(containerName, reachableAddress) {
         console.debug("This method is not implemented yet and returns default values for http service. dont use for now thx");
         return {
             Labels: {
                 "traefik.enable": "true",
-                "traefik.port": proxyPort,
+                "traefik.port": "80",
                 ["traefik.http.routers." + containerName + ".entrypoints"]: "web",
                 ["traefik.http.routers." + containerName + ".rule"]: "Host(`" + reachableAddress + "`)"
             },
