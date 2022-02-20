@@ -15,11 +15,11 @@ module.exports = class VncTraefikProvider extends LabelProvider {
             Image: "vncserver/lubuntu",
             Labels: {
                 "traefik.enable": "true",
-                "traefik.port": "5901",
+                // "traefik.port": "5901",
                 ["traefik.tcp.routers." + containerName + ".entrypoints"]: "vnc",
                 ["traefik.tcp.routers." + containerName + ".rule"]: "HostSNI(`" + reachableAddress + "`)",
                 ["traefik.tcp.routers." + containerName + ".service"]: containerName,
-                ["traefik.tcp.services." + containerName + ".loadbalancer.servers"]: containerName
+                ["traefik.tcp.services." + containerName + ".loadbalancer.servers"]: containerName + ":5901"
             },
         }
     }
