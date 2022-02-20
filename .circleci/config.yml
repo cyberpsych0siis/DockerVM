@@ -46,9 +46,6 @@ jobs:
       - run:
           name: Run Tests
           command: yarn run test
-      - run:
-          name: Build Docker Image
-          command: docker build -t $DOCKER_IMAGE_NAME:latest .
 
   #Builds developer version of node
   build-push:
@@ -63,6 +60,8 @@ jobs:
           # https://circleci.com/docs/2.0/configuration-reference/?section=reference#save_cache
           keys:
             - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Build Docker Image and push to registry
           command: |
