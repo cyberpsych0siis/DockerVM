@@ -18,8 +18,8 @@ module.exports = class VncTraefikProvider extends LabelProvider {
                 // "traefik.port": "5901",
                 ["traefik.tcp.routers." + containerName + ".entrypoints"]: "vnc",
                 ["traefik.tcp.routers." + containerName + ".rule"]: "HostSNI(`" + reachableAddress + "`)",
-                ["traefik.tcp.routers." + containerName + ".service"]: containerName,
-                ["traefik.tcp.services." + containerName + ".loadbalancer.servers"]: containerName + ":5901"
+                // ["traefik.tcp.routers." + containerName + ".service"]: containerName,
+                ["traefik.tcp.services." + containerName + ".loadbalancer.server.port"]: "5901"
             },
         }
     }
