@@ -12,7 +12,8 @@ const DockerClient = require("./DockerClient.js");
 const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
 const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
 
-const fetch = require("node-fetch");
+// const fetch = import('node-fetch').then((mod) => { return mod; });
+const axios = require("axios");
 
 (function () {
   const app = express();
@@ -41,10 +42,12 @@ const fetch = require("node-fetch");
     //if no authentication route is configured just bypass authentication
     if (!process.env.AUTHENTICATION_ROUTE) return true;
 
-    const serverResponse = await fetch((process.env.AUTHENTICATION_ROUTE ?? "/auth"), {method: POST, body: `token=${token}`});
-    const data = await serverResponse.json();
-    console.log(data);
-    
+    // console.log(fetch);
+
+    const serverResponse = await axios.post(process.env.AUTHENTICATION_ROUTE ?? "/auth", {token: token});
+    // const data = await serverResponse.json();
+    console.log(serverResponse);
+
     return true;
   }
 
