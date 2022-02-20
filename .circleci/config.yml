@@ -52,7 +52,7 @@ jobs:
           name: Build Docker Image and push to registry
           command: |
             docker build -t $DOCKER_IMAGE_NAME:latest .
-            echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
+            echo $DOCKER_PWD | docker login $DOCKER_REGISTRY_URL -u $DOCKER_LOGIN --password-stdin
             docker push $DOCKER_IMAGE_NAME:latest
 
 
