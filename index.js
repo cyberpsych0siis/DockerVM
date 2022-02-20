@@ -60,18 +60,13 @@ const fs = require("fs");
           .finally(() => {
             //cleanup
             dClient.remove();
-            // auxContainer.stop();
-            // auxContainer.remove();
-            // container.remove();
           });
       })
       .on("message", (data) => {
         console.log("[WebSocket Client] " + data);
       })
 
-    dClient.start(websocketStream(ws))/* .then((container) => {
-      dClient.attach(websocketStream(ws));
-    }) */
+    dClient.start(websocketStream(ws))
     .then(() => {
       ws.send("New Connection: " + dClient.addr)
     })

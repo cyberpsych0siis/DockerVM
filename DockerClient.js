@@ -1,9 +1,5 @@
 const Docker = require("dockerode");
 const { uuid } = require("uuidv4");
-/* const dockerClient = new Docker(/*{
-    socketPath: "/var/run/docker.sock",
-    version: 'v1.25'
-}*); */
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
@@ -43,12 +39,14 @@ class DockerClient {
 
         this.dockerClient = new Docker();
         this.addr = `${uuid()}.${this.options.subdomain}`;
+        this.name = this.addr.split("-")[0];
+        console.log(this.name);
     }
 
     async createContainer() {
         // console.log("cmd: " + this.options.bootstrapCmd);
         // let addr = ;
-        console.log("[DockerClient]Attaching new Container to " + addr)
+        console.log("[DockerClient]Attaching new Container to " + this.addr)
         return this.dockerClient.createContainer({
             Image: this.options.image,
             AttachStdin: false,
@@ -61,6 +59,12 @@ class DockerClient {
                 `VIRTUAL_HOST=${this.addr}`,      //compatible with jwilder/nginx-proxy - test pls
                 `VIRTUAL_PORT=${this.options.exposedPort}`
             ],
+            Labels: {
+                "traefik.enable": "true",
+                "traefik.port": this.options.exposedPort,
+                ["traefik.http.routers."+this.name+".entrypoints"]: "web",
+                ["traefik.http.routers."+ this.name +".rule"]: "Host(`" + this.addr + "`)"
+            },
             NetworkingConfig: {
                 "EndpointsConfig": {
                     [this.options.networkId]: {
@@ -94,8 +98,6 @@ class DockerClient {
                 });
             })
         });
-        // console.log(await this.docker.inspect());
-        // return await this.docker.start();
     }
 
     /**
@@ -118,12 +120,8 @@ class DockerClient {
         if (this.docker != null) {
             this.docker.attach({ stream: true, stdout: true, stderr: true, stdin: true }, (err, stream) => {
                 console.log("attaching to container");
-                // stream.pipe(pipeStreamOut);
-                // stream.pipe(process.stdout);
                 process.stdin.pipe(stream);
                 this.docker.modem.demuxStream(stream, pipe, pipe);
-                // this.docker.
-                // pipeStreamOut.pipe(());
             });
         } else throw new Error("Docker Container is not running");
     }
