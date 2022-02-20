@@ -15,11 +15,6 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
-      - restore_cache:
-          # See the configuration reference documentation for more details on using restore_cache and save_cache steps
-          # https://circleci.com/docs/2.0/configuration-reference/?section=reference#save_cache
-          keys:
-            - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
       - run:
           name: install packages
           command: npm install --immutable
@@ -35,11 +30,6 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
-      #- restore_cache:
-          # See the configuration reference documentation for more details on using restore_cache and save_cache steps
-          # https://circleci.com/docs/2.0/configuration-reference/?section=reference#save_cache
-      #    keys:
-      #      - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
       - run:
           name: install packages
           command: npm install --immutable
@@ -55,11 +45,6 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
       - checkout
-      - restore_cache:
-          # See the configuration reference documentation for more details on using restore_cache and save_cache steps
-          # https://circleci.com/docs/2.0/configuration-reference/?section=reference#save_cache
-          keys:
-            - node-deps-v1-{{ .Branch }}-{{checksum "package-lock.json"}}
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
