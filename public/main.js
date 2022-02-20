@@ -37,10 +37,14 @@ function createSocket() {
   return s;
 }
 
-function connect() {
+/* function connect() {
   socket = createSocket();
-}
+} */
 
 function send(cmd) {
   socket.send(cmd);
+}
+
+window.onload = () => {
+  socket = createSocket();
 }

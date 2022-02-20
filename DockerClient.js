@@ -9,10 +9,10 @@ class DockerClient {
     options = {
         //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
         host: process.env.DOCKER_REMOTE_HOST ?? '/var/run/docker.sock',
-    
+
         //uses $DOCKER_IMAGE variable. Use in format name:tag. Defaults to 'ubuntu'
         image: process.env.DOCKER_IMAGE ?? 'ubuntu',
-    
+
         //uses $BOOTSTRAP variable. Gets inserted after '/bin/sh -c'. Defaults to const BOOTSTRAP_NOT_DEFINED
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
 
@@ -24,30 +24,31 @@ class DockerClient {
 
         //what network should the new container be attached to?
         networkId: process.env.NETWORK_ID ?? "nginx",
-    
+
         //the websocket that should be used for communication
         websocket: null,
-    
+
         //the container id that should be used instead of a created container - UNUSED
         containerId: null
     }
 
-    constructor(options = {}) {
+    constructor(
+        provider,       //discoverability provider
+        options = {},   //for external support
+    ) {
         for (let key of Object.keys(options)) {
             this.options[key] = options[key];
         }
 
+        this.provider = provider;
         this.dockerClient = new Docker();
         this.addr = `${uuid()}.${this.options.subdomain}`;
-        this.name = this.addr.split("-")[0];
-        console.log(this.name);
+        this.name = this.addr.split("-")[0];    //takes the first part of the uuid v4
     }
 
     async createContainer() {
-        // console.log("cmd: " + this.options.bootstrapCmd);
-        // let addr = ;
-        console.log("[DockerClient]Attaching new Container to " + this.addr)
-        return this.dockerClient.createContainer({
+        console.log("[DockerClient] Attaching new Container to " + this.addr)
+        let properties = {
             Image: this.options.image,
             AttachStdin: false,
             AttachStdout: false,
@@ -55,16 +56,6 @@ class DockerClient {
             Tty: true,
             OpenStdin: false,
             StdinOnce: false,
-            Env: [
-                `VIRTUAL_HOST=${this.addr}`,      //compatible with jwilder/nginx-proxy - test pls
-                `VIRTUAL_PORT=${this.options.exposedPort}`
-            ],
-            Labels: {
-                "traefik.enable": "true",
-                "traefik.port": this.options.exposedPort,
-                ["traefik.http.routers."+this.name+".entrypoints"]: "web",
-                ["traefik.http.routers."+ this.name +".rule"]: "Host(`" + this.addr + "`)"
-            },
             NetworkingConfig: {
                 "EndpointsConfig": {
                     [this.options.networkId]: {
@@ -72,7 +63,17 @@ class DockerClient {
                     }
                 }
             }
-        });
+        };
+
+        Object.assign(properties, this.provider?.getProperties(
+            String(this.name),
+            String(this.addr),
+            String(this.options.exposedPort)
+        ));   //assigns the provider properties to the container properties
+
+        console.log(properties);
+
+        return this.dockerClient.createContainer(properties);
     }
 
     async stop() {
@@ -86,13 +87,10 @@ class DockerClient {
     async start(pipe) {
         this.docker = await this.createContainer();
         return this.docker.start((data) => {
-            this.docker.exec({Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd ], AttachStdin: true, AttachStdout: true}, (err, exec) => {
+            this.docker.exec({ Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
                 if (err) throw err;
 
-//                console.log(this.options.bootstrapCmd);
-//		console.log(exec);
-
-                exec.start({hijack: true, stdin: true}, (err, stream) => {
+                exec.start({ hijack: true, stdin: true }, (err, stream) => {
                     pipe.pipe(stream);
                     this.docker.modem.demuxStream(stream, pipe, process.stderr);
                 });
@@ -107,23 +105,8 @@ class DockerClient {
      */
     async remove() {
         if (this.docker != null) {
-          return await this.docker.remove();
+            return await this.docker.remove();
         }
-    }
-
-    //pipes our docker output stream to the websocket
-    /**
-     *
-     * @deprecated
-     */
-    attach(pipeStreamOut, pipeStreamIn) {
-        if (this.docker != null) {
-            this.docker.attach({ stream: true, stdout: true, stderr: true, stdin: true }, (err, stream) => {
-                console.log("attaching to container");
-                process.stdin.pipe(stream);
-                this.docker.modem.demuxStream(stream, pipe, pipe);
-            });
-        } else throw new Error("Docker Container is not running");
     }
 }
 

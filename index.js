@@ -9,8 +9,9 @@ const expressStatic = require("express-static");
 const process = require("process");
 
 const DockerClient = require("./DockerClient.js");
+const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
 
-const fs = require("fs");
+// const fs = require("fs");
 
 (function () {
   const app = express();
@@ -32,11 +33,12 @@ const fs = require("fs");
 
   //on new WebSocketServer connection, connect websocket with a new DockerClient instance
   wss.on('connection', function connect(ws) {
-    console.log("New Connection");
-    let dClient = new DockerClient();
+    console.log("[WebSocket] New Connection");
+    // let dClient = new DockerClient();
+    let dClient = null;
 
     //options.websocket.on('open', () => {
-    ws.send("[WebSocket] connection opened");
+    ws.send("Connection established");
     console.log("[WebSocket] connection opened");
 
     //if our webserver emits an error, print it to stderr
@@ -49,6 +51,7 @@ const fs = require("fs");
 
         let auxContainer;
 
+        if (dClient != null) {
         dClient.stop()
           .then((container) => {
             auxContainer = container;
@@ -61,20 +64,25 @@ const fs = require("fs");
             //cleanup
             dClient.remove();
           });
+        }
       })
       .on("message", (data) => {
         console.log("[WebSocket Client] " + data);
-      })
-
-    dClient.start(websocketStream(ws))
-    .then(() => {
-      ws.send("New Connection: " + dClient.addr)
-    })
-      .catch((err) => {
-        dClient.stop();
-        dClient.remove();
-        console.error(err);
-        ws.send(err.toString());
+        if (data == "start") {
+          let provider = new HttpTraefikProvider();
+          dClient = new DockerClient(provider);
+          
+          dClient.start(websocketStream(ws))
+          .then(() => {
+            ws.send("New Connection: " + dClient.addr)
+          })
+          .catch((err) => {
+            dClient.stop();
+            dClient.remove();
+            console.error(err);
+            ws.send(err.toString());
+          });
+        }
       });
   });
 
@@ -86,6 +94,7 @@ const fs = require("fs");
   server.on('upgrade', (request, socket, head) => {
     let { path } = parse(request.url);
 
+    //Checks if current connection is authorized
     if (validateSession(request.headers.cookie)) {
       if (path === "/socket" || path === "/") {
         wss.handleUpgrade(request, socket, head, socket => {
