@@ -10,7 +10,7 @@ const process = require("process");
 
 const DockerClient = require("./DockerClient.js");
 const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
-const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
+const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
 
 // const fs = require("fs");
 
@@ -49,8 +49,8 @@ const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
       case "http":
         return new HttpTraefikProvider();
 
-      case "tcp":
-        return new TcpTraefikProvider();
+      case "vnc":
+        return new VncTraefikProvider();
 
       default:
         throw new Error("Unknown Provider specified");

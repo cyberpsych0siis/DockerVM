@@ -52,3 +52,7 @@ window.onload = () => {
 function startNginx() {
   socket.send("start http");
 }
+
+function startVnc() {
+  socket.send("start vnc");
+}
