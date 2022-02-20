@@ -66,9 +66,9 @@ jobs:
       - run:
           name: Build Docker Image and push to registry
           command: |
-            docker build -t http://79ahe0g5qmrffm2c.myfritz.net:5000/$DOCKER_IMAGE_NAME:latest .
+            docker build -t $DOCKER_IMAGE_NAME:latest .
             echo $DOCKER_PWD | docker login -u $DOCKER_LOGIN --password-stdin
-            docker push http://79ahe0g5qmrffm2c.myfritz.net:5000/$DOCKER_IMAGE_NAME:latest
+            docker push $DOCKER_IMAGE_NAME:latest
 
 
 
