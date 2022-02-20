@@ -10,6 +10,7 @@ const process = require("process");
 
 const DockerClient = require("./DockerClient.js");
 const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
+const TcpTraefikProvider = require('./provider/TcpTraefikProvider.js');
 
 // const fs = require("fs");
 
@@ -29,6 +30,23 @@ const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
   //bypass validation for now
   function validateSession(token) {
     return true;
+  }
+
+  function getProviderByMessage(msg) {
+    console.log(msg);
+    if (msg == "") throw new Error("Invalid message");
+
+    const s = msg.split(" ");
+    switch (s[1]) {
+      case "http":
+        return new HttpTraefikProvider();
+
+      case "tcp":
+        return new TcpTraefikProvider();
+
+      default:
+        throw new Error("Unknown Provider specified");
+    }
   }
 
   //on new WebSocketServer connection, connect websocket with a new DockerClient instance
@@ -68,8 +86,9 @@ const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
       })
       .on("message", (data) => {
         console.log("[WebSocket Client] " + data);
-        if (data == "start") {
-          let provider = new HttpTraefikProvider();
+
+        try {
+          let provider = getProviderByMessage(data.toString());
           dClient = new DockerClient(provider);
           
           dClient.start(websocketStream(ws))
@@ -82,7 +101,10 @@ const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
             console.error(err);
             ws.send(err.toString());
           });
+        } catch (e) {
+          ws.send(e.toString());
         }
+        // }
       });
   });
 

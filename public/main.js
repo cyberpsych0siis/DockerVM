@@ -48,3 +48,7 @@ function send(cmd) {
 window.onload = () => {
   socket = createSocket();
 }
+
+function startNginx() {
+  socket.send("start http");
+}
