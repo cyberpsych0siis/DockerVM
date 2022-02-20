@@ -60,15 +60,10 @@ class DockerClient {
                 `VIRTUAL_PORT=${this.options.exposedPort}`
             ],
             Labels: {
-                // tcp:
-                // `services.my-service.loadBalancer.servers.address=<private-ip-server-1>:<private-port-server-1>`
                 "traefik.enable": "true",
                 "traefik.port": this.options.exposedPort,
-                // ["traefik.tcp.routers." + this.name + ".entrypoints"]: "ssh",
-                // ["traefik.tcp.routers." + this.name + ".rule"]: "HostSNI(`" + this.addr + "`)"
                 ["traefik.http.routers."+this.name+".entrypoints"]: "web",
                 ["traefik.http.routers."+ this.name +".rule"]: "Host(`" + this.addr + "`)"
-                // "traefik.tcp.routers." + this.name + ".service=",
             },
             NetworkingConfig: {
                 "EndpointsConfig": {
@@ -103,8 +98,6 @@ class DockerClient {
                 });
             })
         });
-        // console.log(await this.docker.inspect());
-        // return await this.docker.start();
     }
 
     /**
@@ -127,12 +120,8 @@ class DockerClient {
         if (this.docker != null) {
             this.docker.attach({ stream: true, stdout: true, stderr: true, stdin: true }, (err, stream) => {
                 console.log("attaching to container");
-                // stream.pipe(pipeStreamOut);
-                // stream.pipe(process.stdout);
                 process.stdin.pipe(stream);
                 this.docker.modem.demuxStream(stream, pipe, pipe);
-                // this.docker.
-                // pipeStreamOut.pipe(());
             });
         } else throw new Error("Docker Container is not running");
     }
