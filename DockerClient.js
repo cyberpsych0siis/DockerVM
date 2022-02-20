@@ -64,8 +64,10 @@ class DockerClient {
                 // `services.my-service.loadBalancer.servers.address=<private-ip-server-1>:<private-port-server-1>`
                 "traefik.enable": "true",
                 "traefik.port": this.options.exposedPort,
-                ["traefik.tcp.routers." + this.name + ".entrypoints"]: "ssh",
-                ["traefik.tcp.routers." + this.name + ".rule"]: "HostSNI(`" + this.addr + "`)"
+                // ["traefik.tcp.routers." + this.name + ".entrypoints"]: "ssh",
+                // ["traefik.tcp.routers." + this.name + ".rule"]: "HostSNI(`" + this.addr + "`)"
+                "traefik.http.routers.http.entrypoints": "web",
+                "traefik.http.routers.http.rule": "Host(`" + this.addr + "`)"
                 // "traefik.tcp.routers." + this.name + ".service=",
             },
             NetworkingConfig: {
