@@ -12,6 +12,7 @@ module.exports = class VncTraefikProvider extends LabelProvider {
         console.debug("This method is not implemented yet and returns default values for http service. dont use for now thx");
         return {
             Hostname: containerName,
+            Image: "jumanjiman/xrdp",
             Labels: {
                 "traefik.enable": "true",
                 "traefik.port": "5900",
