@@ -12,7 +12,7 @@ const DockerClient = require("./DockerClient.js");
 const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
 const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
 
-// const fs = require("fs");
+const fetch = require("node-fetch");
 
 (function () {
   const app = express();
@@ -36,7 +36,15 @@ const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
   });
 
   //bypass validation for now
-  function validateSession(token) {
+  async function validateSession(token) {
+
+    //if no authentication route is configured just bypass authentication
+    if (!process.env.AUTHENTICATION_ROUTE) return true;
+
+    const serverResponse = await fetch((process.env.AUTHENTICATION_ROUTE ?? "/auth"), {method: POST, body: `token=${token}`});
+    const data = await serverResponse.json();
+    console.log(data);
+    
     return true;
   }
 
