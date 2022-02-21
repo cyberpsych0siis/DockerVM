@@ -57,6 +57,10 @@ function startVnc() {
   socket.send("start vnc");
 }
 
+function startNoVnc() {
+  socket.send("start novnc");
+}
+
 function startRdp() {
   socket.send("start rdp");
 }

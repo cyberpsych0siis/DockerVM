@@ -9,7 +9,7 @@ import process from 'process';
 
 import DockerClient from './DockerClient.js';
 import HttpTraefikProvider from './provider/HttpTraefikProvider.js';
-import VncTraefikProvider from './provider/VncTraefikProvider.js';
+import VncTraefikProvider, { NoVncTraefikProvider } from './provider/VncTraefikProvider.js';
 import axios from 'axios';
 import RdpTraefikProvider from './provider/RdpTraefikProvider.js';
 
@@ -68,6 +68,9 @@ import RdpTraefikProvider from './provider/RdpTraefikProvider.js';
 
       case "rdp":
         return new RdpTraefikProvider();
+      
+      case "novnc":
+        return new NoVncTraefikProvider();
 
       default:
         throw new Error("Unknown Provider specified");

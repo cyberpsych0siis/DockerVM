@@ -24,3 +24,24 @@ export default class VncTraefikProvider extends LabelProvider {
         }
     }
 }
+
+export class NoVncTraefikProvider extends LabelProvider {
+    /**
+     * 
+     * @param {string} containerName 
+     * @param {string} reachableAddress 
+     * @param {string} proxyPort 
+     * @returns Object
+     */
+    getProperties(containerName, reachableAddress) {
+        return {
+            Image: "jarvis/lubuntu-novnc:latest",
+            Labels: {
+                "traefik.enable": "true",
+                "traefik.port": "80",
+                ["traefik.http.routers." + containerName + ".entrypoints"]: "websecure",
+                ["traefik.http.routers." + containerName + ".rule"]: "Host(`" + reachableAddress + "`)"
+            },
+        }
+    }
+}
