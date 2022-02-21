@@ -56,3 +56,7 @@ function startNginx() {
 function startVnc() {
   socket.send("start vnc");
 }
+
+function startRdp() {
+  socket.send("start rdp");
+}

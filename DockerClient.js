@@ -16,7 +16,7 @@ export default class DockerClient {
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
 
         //under which subdomain should the containers be accessible?
-        subdomain: process.env.SUBDOMAIN ?? "s.rillo5000.com",
+        subdomain: process.env.SUBDOMAIN ?? "instance.localhost.app",
 
         //what network should the new container be attached to?
         networkId: process.env.NETWORK_ID ?? "nginx",
@@ -43,7 +43,6 @@ export default class DockerClient {
     }
 
     async createContainer() {
-        console.log("[DockerClient] Attaching new Container to " + this.addr)
         let properties = {
             AttachStdin: false,
             AttachStdout: false,
@@ -84,10 +83,16 @@ export default class DockerClient {
             this.docker.exec({ Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
                 if (err) throw err;
 
+                console.log("[DockerClient] Attaching new Container to " + this.addr)
+
+
                 exec.start({ hijack: true, stdin: true }, (err, stream) => {
-                    pipe.pipe(stream);
-                    this.docker.modem.demuxStream(stream, pipe, process.stderr);
+                    if (pipe) {
+                        pipe.pipe(stream);
+                        this.docker.modem.demuxStream(stream, pipe, process.stderr);
+                    }
                 });
+
             })
         });
     }
@@ -105,14 +110,19 @@ export default class DockerClient {
 }
 
 export class LabelProvider {
+
     /**
      * Should return options on how the element is connected to the proxy
      */
     getProperties(
         containerName,      //The name of the container (typically the first part of a UUID)
         reachableAddress    //external address thats used to connect to the client
-        ) {
+    ) {
         return {}
+    }
+
+    setWebsocket(ws) {
+
     }
 }
 
