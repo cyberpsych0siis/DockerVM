@@ -1,4 +1,6 @@
 language: node_js
+node_js:
+  - 16.9
 os: linux
 arch:
   - amd64
@@ -9,13 +11,11 @@ arch:
 #    - main
 
 stages:
-node_js:
-  - 16.9
 
 services:
   - docker
 
-before_install:
+script:
   - docker build -t "$DOCKER_IMAGE_NAME":latest .
   - docker tag "$DOCKER_IMAGE_NAME":latest "$DOCKER_IMAGE_NAME":git-"$TRAVIS_BRANCH"
   - echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY -u "$DOCKER_USERNAME" --password-stdin
