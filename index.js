@@ -1,31 +1,15 @@
-// const WebSocketServer = require('ws').Server;
-// import { Server as WebSocketServer } from 'ws';
 import { WebSocketServer } from 'ws';
-
-// const websocketStream = require('websocket-stream/stream');
-// import websocketStream from 'websocket-stream/stream';
-import pkg from 'websocket-stream';
-const { stream: websocketStream } = pkg;
-// const http = require("http");
-// const logger = require("morgan");
+import websocketStream from 'websocket-stream/stream.js';
 import logger from 'morgan';
 import { parse } from 'url';
 
-// const express = require("express");
 import express from 'express';
-// const expressStatic = require("express-static");
 import expressStatic from 'express-static';
-// const process = require("process");
 import process from 'process';
 
-// const DockerClient = require("./DockerClient.js");
 import DockerClient from './DockerClient.js';
 import HttpTraefikProvider from './provider/HttpTraefikProvider.js';
 import VncTraefikProvider from './provider/VncTraefikProvider.js';
-// const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
-
-// const fetch = import('node-fetch').then((mod) => { return mod; });
-// const axios = require("axios");
 import axios from 'axios';
 
 (function () {
@@ -48,6 +32,10 @@ import axios from 'axios';
   const wss = new WebSocketServer({
     noServer: true
   });
+
+    //our http server which handles websocket proxy and static
+    const PORT = process.env.WEBSOCKET_PORT ?? 8085;
+    const server = app.listen(PORT, () => { console.log("[WebSocket] Listening to port " + PORT) });/*  */
 
   //bypass validation for now
   async function validateSession(token) {
@@ -119,7 +107,7 @@ import axios from 'axios';
 
         try {
           let provider = getProviderByMessage(data.toString());
-          dClient = new DockerClient.default(provider);
+          dClient = new DockerClient(provider);
 
           dClient.start(websocketStream(ws))
             .then(() => {
@@ -136,10 +124,6 @@ import axios from 'axios';
         }
       });
   });
-
-  //our http server which handles websocket proxy and static
-  const PORT = process.env.WEBSOCKET_PORT ?? 8085;
-  const server = app.listen(PORT, () => { console.log("[WebSocket] Listening to port " + PORT) });
 
   //If our HTTP-Server gets an upgrade check the authorization and if success continue
   server.on('upgrade', (request, socket, head) => {
