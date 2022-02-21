@@ -24,7 +24,7 @@ export default class RdpTraefikProvider extends LabelProvider {
                 "traefik.enable": "true",
                 "traefik.port": "3389",
                 ["traefik.tcp.routers." + containerName + ".entrypoints"]: "rdp",
-                ["traefik.tcp.routers." + containerName + ".entrypoints.tls"]: "{}",
+                ["traefik.tcp.routers." + containerName + ".entrypoints.tls"]: "true",
                 ["traefik.tcp.routers." + containerName + ".rule"]: "HostSNI(`" + reachableAddress + "`)",
                 // ["traefik.tcp.routers." + containerName + ".service"]: containerName,
                 ["traefik.tcp.services." + containerName + ".loadbalancer.server.port"]: "3389"
