@@ -16,7 +16,7 @@ export default class DockerClient {
         bootstrapCmd: process.env.BOOTSTRAP ?? BOOTSTRAP_NOT_DEFINED,
 
         //under which subdomain should the containers be accessible?
-        subdomain: process.env.SUBDOMAIN ?? "instance.localhost.app",
+        subdomain: process.env.SUBDOMAIN ?? "instance.app.localhost",
 
         //what network should the new container be attached to?
         networkId: process.env.NETWORK_ID ?? "nginx",
