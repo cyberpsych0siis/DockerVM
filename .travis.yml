@@ -7,8 +7,6 @@ arch:
 branches: main
 
 stages:
-- name: yarn test
-  if: branch = main
 node_js:
   - 16.9
 
