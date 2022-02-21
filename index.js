@@ -11,6 +11,7 @@ import DockerClient from './DockerClient.js';
 import HttpTraefikProvider from './provider/HttpTraefikProvider.js';
 import VncTraefikProvider from './provider/VncTraefikProvider.js';
 import axios from 'axios';
+import RdpTraefikProvider from './provider/RdpTraefikProvider.js';
 
 (function () {
   const app = express();
@@ -63,6 +64,9 @@ import axios from 'axios';
 
       case "vnc":
         return new VncTraefikProvider();
+
+      case "rdp":
+        return new RdpTraefikProvider();
 
       default:
         throw new Error("Unknown Provider specified");
