@@ -35,7 +35,7 @@ export class NoVncTraefikProvider extends LabelProvider {
      */
     getProperties(containerName, reachableAddress) {
         return {
-            Image: "jarvis/lubuntu-novnc:latest",
+            Image: "jarvis/lubuntu-novnc",
             Labels: {
                 "traefik.enable": "true",
                 "traefik.port": "80",
