@@ -1,6 +1,6 @@
 FROM node:16
 
-HEALTHCHECK --interval=120s CMD curl -f http://localhost:8085/health || exit 1
+HEALTHCHECK --interval=5s CMD curl -f http://localhost:8085/health || exit 1
 
 WORKDIR /app
 ENV BOOTSTRAP="tail -f /dev/random"

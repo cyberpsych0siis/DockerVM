@@ -17,7 +17,8 @@ import RdpTraefikProvider from './provider/RdpTraefikProvider.js';
   const app = express();
   app.use(logger('dev', {
     skip: function (req, res) {
-      if (req.url == '/health') {
+      // console.log(req.url);
+      if (req.url == '/health' || req.url == '/') {
         return true;
       } else {
         return false;
