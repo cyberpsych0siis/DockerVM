@@ -85,7 +85,6 @@ export default class DockerClient {
 
                 console.log("[DockerClient] Attaching new Container to " + this.addr)
 
-
                 exec.start({ hijack: true, stdin: true }, (err, stream) => {
                     if (pipe) {
                         pipe.pipe(stream);
