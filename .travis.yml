@@ -4,9 +4,9 @@ arch:
   - amd64
   - arm64
 
-branches:
-  only:
-    - main
+#branches:
+#  only:
+#    - main
 
 stages:
 node_js:
@@ -15,12 +15,10 @@ node_js:
 services:
   - docker
 
-install:
+before_install:
   - docker build -t "$DOCKER_IMAGE_NAME":"$TRAVIS_BRANCH" .
-
-before_deploy:
   - docker run "$DOCKER_IMAGE_NAME" npm run test
 
-deploy:
+install:
   - echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY -u "$DOCKER_USERNAME" --password-stdin
   - docker push "$DOCKER_IMAGE_NAME":"$TRAVIS_BRANCH"
