@@ -1,5 +1,7 @@
-const Docker = require("dockerode");
-const { uuid } = require("uuidv4");
+// const Docker = require("dockerode");
+import Docker from 'dockerode';
+// const { uuid } = require("uuidv4");
+import { uuid } from 'uuidv4';
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
