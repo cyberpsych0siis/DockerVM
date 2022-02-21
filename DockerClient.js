@@ -114,5 +114,5 @@ class LabelProvider {
     }
 }
 
-module.exports.default = DockerClient;
-module.exports.LabelProvider = LabelProvider;
+exports.default = DockerClient;
+exports.LabelProvider = LabelProvider;

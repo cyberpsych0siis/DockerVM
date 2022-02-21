@@ -106,7 +106,7 @@ const axios = require("axios");
 
         try {
           let provider = getProviderByMessage(data.toString());
-          dClient = new DockerClient(provider);
+          dClient = new DockerClient.default(provider);
 
           dClient.start(websocketStream(ws))
             .then(() => {
