@@ -1,19 +1,32 @@
-const WebSocketServer = require('ws').Server;
-const websocketStream = require('websocket-stream/stream');
-const http = require("http");
-const logger = require("morgan");
-const { parse } = require("url");
+// const WebSocketServer = require('ws').Server;
+// import { Server as WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 
-const express = require("express");
-const expressStatic = require("express-static");
-const process = require("process");
+// const websocketStream = require('websocket-stream/stream');
+// import websocketStream from 'websocket-stream/stream';
+import pkg from 'websocket-stream';
+const { stream: websocketStream } = pkg;
+// const http = require("http");
+// const logger = require("morgan");
+import logger from 'morgan';
+import { parse } from 'url';
 
-const DockerClient = require("./DockerClient.js");
-const HttpTraefikProvider = require("./provider/HttpTraefikProvider.js");
-const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
+// const express = require("express");
+import express from 'express';
+// const expressStatic = require("express-static");
+import expressStatic from 'express-static';
+// const process = require("process");
+import process from 'process';
+
+// const DockerClient = require("./DockerClient.js");
+import DockerClient from './DockerClient.js';
+import HttpTraefikProvider from './provider/HttpTraefikProvider.js';
+import VncTraefikProvider from './provider/VncTraefikProvider.js';
+// const VncTraefikProvider = require('./provider/VncTraefikProvider.js');
 
 // const fetch = import('node-fetch').then((mod) => { return mod; });
-const axios = require("axios");
+// const axios = require("axios");
+import axios from 'axios';
 
 (function () {
   const app = express();

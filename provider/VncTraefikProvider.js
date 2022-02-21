@@ -1,6 +1,6 @@
-const { LabelProvider } = require("../DockerClient.js");
+import { LabelProvider } from "../DockerClient.js";
 
-module.exports = class VncTraefikProvider extends LabelProvider {
+export default class VncTraefikProvider extends LabelProvider {
     /**
      * 
      * @param {string} containerName 

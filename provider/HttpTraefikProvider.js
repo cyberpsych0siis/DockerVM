@@ -1,6 +1,6 @@
-const { LabelProvider } = require("../DockerClient.js");
+import { LabelProvider } from "../DockerClient.js";
 
-module.exports = class HttpTraefikProvider extends LabelProvider {
+export default class HttpTraefikProvider extends LabelProvider {
     /**
      * 
      * @param {string} containerName 
