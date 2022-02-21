@@ -19,3 +19,4 @@ before_install:
   - docker build -t "$DOCKER_IMAGE_NAME":"$TRAVIS_BRANCH" .
   - echo "$DOCKER_PASSWORD" | docker login $DOCKER_REGISTRY -u "$DOCKER_USERNAME" --password-stdin
   - docker push "$DOCKER_IMAGE_NAME":"$TRAVIS_BRANCH"
+  - docker push "$DOCKER_IMAGE_NAME":"latest"
