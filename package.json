@@ -3,6 +3,7 @@
   "version": "0.0.2",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "dependencies": {
     "axios": "^0.26.0",
     "dockerode": "^3.3.1",

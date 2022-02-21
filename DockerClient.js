@@ -4,7 +4,7 @@ const { uuid } = require("uuidv4");
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
 
-class DockerClient {
+export default class DockerClient {
 
     options = {
         //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
@@ -102,7 +102,7 @@ class DockerClient {
     }
 }
 
-class LabelProvider {
+export class LabelProvider {
     /**
      * Should return options on how the element is connected to the proxy
      */
@@ -114,5 +114,5 @@ class LabelProvider {
     }
 }
 
-exports.default = DockerClient;
-exports.LabelProvider = LabelProvider;
+/* exports.default = DockerClient;
+exports.LabelProvider = LabelProvider; */
