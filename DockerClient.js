@@ -3,6 +3,8 @@ import Docker from 'dockerode';
 // const { uuid } = require("uuidv4");
 import { uuid } from 'uuidv4';
 
+// import os from 'os';
+
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
 
@@ -42,8 +44,9 @@ export default class DockerClient {
         this.name = this.addr.split("-")[0];    //takes the first part of the uuid v4
     }
 
-    async createContainer() {
+    async createContainer(cbUrl) {
         let properties = {
+            Hostname: this.name,
             AttachStdin: false,
             AttachStdout: false,
             AttachStderr: false,
@@ -64,6 +67,17 @@ export default class DockerClient {
             String(this.addr)
         ));   //assigns the provider properties to the container properties
 
+        
+        if (cbUrl) {
+            console.log(cbUrl);
+            
+            properties.Env = [
+                `CALLBACK_ENDPOINT=${cbUrl}`,
+                `ENDPOINT_URI=${this.addr}`
+            ];
+
+            properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
+        }
         console.log(properties);
 
         return this.dockerClient.createContainer(properties);
@@ -77,13 +91,13 @@ export default class DockerClient {
         }
     }
 
-    async start(pipe) {
-        this.docker = await this.createContainer();
+    async start(pipe, callbackUrl) {
+        this.docker = await this.createContainer(callbackUrl);
         return this.docker.start((data) => {
             this.docker.exec({ Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
                 if (err) throw err;
 
-                console.log("[DockerClient] Attaching new Container to " + this.addr)
+                console.log("[DockerClient] Attaching new Container to " + this.addr);
 
                 exec.start({ hijack: true, stdin: true }, (err, stream) => {
                     if (pipe) {

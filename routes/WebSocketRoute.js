@@ -6,6 +6,8 @@ import HttpTraefikProvider from '../provider/HttpTraefikProvider.js';
 import VncTraefikProvider, { NoVncTraefikProvider } from '../provider/VncTraefikProvider.js';
 import RdpTraefikProvider from '../provider/RdpTraefikProvider.js';
 
+import os from 'os';
+
 function getProviderByMessage(msg) {
     console.log(msg);
     if (msg == "") throw new Error("Invalid message");
@@ -29,7 +31,24 @@ function getProviderByMessage(msg) {
     }
 }
 
-export default (expressServer) => {
+const cbStack = {};
+
+export const callbackRoute = (req, res) => {
+    // console.log(req.body);
+    // console.log("Machine ID " + req.body.id + " is ready");
+    // console.log(cbStack);
+    cbStack[req.body.id].send(req.body.id);
+    res.status(200);
+}
+
+export const serveBootstrapRoute = (req, res) => {
+    res.setHeader("Content-Type", "plain/text");
+    res.send(`!#/bin/sh\nexport HOSTNAME = $(cat /etc/hostname) && curl -X POST $CALLBACK_ENDPOINT -d "id=$HOSTNAME" -d "payload=$ENDPOINT_URI"`);
+}
+
+export default (
+    expressServer
+) => {
     const websocketServer = new WebSocketServer({
         noServer: true,
         path: "/socket",
@@ -82,9 +101,12 @@ export default (expressServer) => {
                 let provider = getProviderByMessage(data.toString());
                 dClient = new DockerClient(provider);
 
-                dClient.start(websocketStream(websocket))
+                cbStack[dClient.name] = websocket;
+
+                dClient.start(websocketStream(websocket), `${os.hostname()}:${(process.env.WEBSOCKET_PORT ?? 8085)}`)
                     .then(() => {
-                        websocket.send("New Connection: " + dClient.addr)
+                        // websocket.send("New Connection: " + dClient.addr)
+                        websocket.send("Starting your instance... " + dClient.addr);
                     })
                     .catch((err) => {
                         dClient.stop();
