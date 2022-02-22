@@ -29,7 +29,11 @@ import RdpTraefikProvider from './provider/RdpTraefikProvider.js';
   app.use("/health", (req, res) => {
     res.send({ status: true });
   });
+
   app.use("/", expressStatic('public'));
+  // app.get("/", (req, res) => {
+    // res.sendFile('public/index.html');
+  // });
 
   const wss = new WebSocketServer({
     noServer: true

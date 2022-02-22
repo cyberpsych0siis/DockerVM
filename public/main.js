@@ -24,15 +24,8 @@ function createSocket() {
   }
 
   s.onerror = err => {
-    console.error(err.data);
+    console.error(err);
   }
-
-/*   setTimeout(() => {
-    alert("closing");
-    s.close();
-
-    console.log(s);
-  }, 5000); */
 
   return s;
 }
