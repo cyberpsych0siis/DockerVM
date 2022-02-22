@@ -76,7 +76,7 @@ export default class DockerClient {
                 `ENDPOINT_URI=${this.addr}`
             ];
 
-            properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
+            // properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
         }
         console.log(properties);
 
