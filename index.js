@@ -2,7 +2,7 @@
 import logger from 'morgan';
 import { parse } from 'url';
 
-import WebSocketRoute from './routes/WebSocketRoute.js';
+import WebSocketRoute, { callbackRoute, serveBootstrapRoute } from './routes/WebSocketRoute.js';
 import HealthcheckRoute from './routes/HealthcheckRoute.js';
 
 import express from 'express';
@@ -27,7 +27,19 @@ import FrontendRoute from './routes/FrontendRoute.js';
     }));
 
     app.use("/health", HealthcheckRoute);
-    app.use("/", expressStatic('public'));
+        //callback:
+        /* callbackApp.post("/cb/", (req, res) => {
+            console.log("Machine ID " + req.params.machineId + " is ready");
+            console.log(cbStack);
+            cbStack[req.params.machineId].send(req.params.machineId);
+            res.send("ok");
+    
+            delete cbStack[req.params.machineId];
+        }); */
+
+    app.get("/bootstrap", serveBootstrapRoute);
+
+    app.post("/cb", express.urlencoded(), callbackRoute);
 
     //our http server which handles websocket proxy and static
     const PORT = process.env.WEBSOCKET_PORT ?? 8085;
@@ -53,5 +65,7 @@ import FrontendRoute from './routes/FrontendRoute.js';
         return true;
     }
 
-    WebSocketRoute(server);
+    WebSocketRoute(server, app);
+
+    app.use(expressStatic('public'));
 })();
