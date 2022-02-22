@@ -43,7 +43,7 @@ export const callbackRoute = (req, res) => {
 
 export const serveBootstrapRoute = (req, res) => {
     res.setHeader("Content-Type", "plain/text");
-    res.send(`!#/bin/sh\nexport HOSTNAME = $(cat /etc/hostname) && curl -X POST $CALLBACK_ENDPOINT -d "id=$HOSTNAME" -d "payload=$ENDPOINT_URI"`);
+    res.send(`#!/bin/sh\nexport HOSTNAME = $(cat /etc/hostname) && curl -X POST $CALLBACK_ENDPOINT -d "id=$HOSTNAME" -d "payload=$ENDPOINT_URI"`);
 }
 
 export default (
