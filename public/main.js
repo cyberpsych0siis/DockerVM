@@ -1,7 +1,3 @@
-/*window.onload = () => {
-  createSocket();
-}*/
-
 var socket;
 
 function createSocket() {
@@ -30,10 +26,6 @@ function createSocket() {
   return s;
 }
 
-/* function connect() {
-  socket = createSocket();
-} */
-
 function send(cmd) {
   socket.send(cmd);
 }
@@ -43,17 +35,17 @@ window.onload = () => {
 }
 
 function startNginx() {
-  socket.send("start http");
+  send("start http");
 }
 
 function startVnc() {
-  socket.send("start vnc");
+  send("start vnc");
 }
 
 function startNoVnc() {
-  socket.send("start novnc");
+  send("start novnc");
 }
 
 function startRdp() {
-  socket.send("start rdp");
+  send("start rdp");
 }
