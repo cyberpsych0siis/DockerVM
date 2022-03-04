@@ -15,5 +15,5 @@ LABEL traefik.http.routers.vscodehost.middlewares auth_then_strip@file,errorcats
 LABEL traefik.port=8085
 COPY . .
 RUN yarn
-CMD ["yarn", "prod"]
+CMD ["yarn", "start"]
 EXPOSE 8085
