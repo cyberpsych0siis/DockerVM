@@ -6,7 +6,7 @@ function createSocket() {
 
   s.onmessage = async data => {
     console.log(data);
-    let logElem = document.getElementById("log");
+    let logElem = document.getElementById("linkAnchor");
     let msg = "no message";
     switch (typeof await data.data) {
       case "object":
@@ -28,12 +28,13 @@ function createSocket() {
 }
 
 function send(cmd) {
+  if (!socket) socket = createSocket();
   socket.send(cmd);
 }
 
-window.onload = () => {
+/* window.onload = () => {
   socket = createSocket();
-}
+} */
 
 function startNginx() {
   send("start http");
