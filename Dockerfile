@@ -11,7 +11,7 @@ ENV BOOTSTRAP="tail -f /dev/random"
 ENV NETWORK_ID=vm_net
 # LABEL traefik.http.routers.vscodehost.entrypoints=web
 LABEL traefik.http.routers.vscodehost.rule PathPrefix(`/vm`)
-LABEL traefik.http.routers.userarea.middlewares auth_then_strip@file,errorcats@docker
+LABEL traefik.http.routers.vscodehost.middlewares auth_then_strip@file,errorcats@docker
 LABEL traefik.port=8085
 COPY . .
 RUN yarn
