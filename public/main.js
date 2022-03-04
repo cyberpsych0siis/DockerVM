@@ -28,13 +28,18 @@ function createSocket() {
 }
 
 function send(cmd) {
-  if (!socket) socket = createSocket();
+  // if (!socket) socket = createSocket();
   socket.send(cmd);
 }
 
 /* window.onload = () => {
-  socket = createSocket();
 } */
+
+(function() {
+  window.addEventListener("load", (e) => {
+    socket = createSocket();
+  });
+})();
 
 function startNginx() {
   send("start http");
