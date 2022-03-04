@@ -1,7 +1,8 @@
 var socket;
 
 function createSocket() {
-  let s = new WebSocket("ws://" + location.host + "/socket");
+  // let s = new WebSocket("ws://" + location.host + "/");
+  let s = new WebSocket("ws://" + location.host + location.pathname + "/socket");
 
   s.onmessage = async data => {
     console.log(data);
