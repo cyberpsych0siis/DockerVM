@@ -19,7 +19,7 @@ jobs:
         uses: tj-actions/branch-names@v5.1
       - name: Running on the default branch.
         if: steps.branch-name.outputs.current_branch == 'main'
-        run: "Flipping Debug Switch to OFF"
+        run: echo "Flipping Debug Switch to OFF"
         env:
           DEBUG: 0
         # Outputs: "Running on default: main".
