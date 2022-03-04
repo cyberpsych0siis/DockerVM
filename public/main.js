@@ -49,3 +49,7 @@ function startNoVnc() {
 function startRdp() {
   send("start rdp");
 }
+
+function startVscode() {
+  send("start vscode");
+}
