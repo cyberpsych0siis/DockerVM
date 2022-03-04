@@ -1,16 +1,27 @@
 name: GitHub Actions Demo
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
 jobs:
   DeployToRegistry:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
       - name: Docker Build & Push Action
         uses: mr-smithers-excellent/docker-build-push@v5.6
         with:
           image: cyberpsych0siis/dockervm
-          tags: latest
+          tags: ${{ steps.branch-name.outputs.current_branch }}
           registry: thallosaurus.de
           dockerfile: Dockerfile
           username: ${{ secrets.DOCKER_USERNAME }}
