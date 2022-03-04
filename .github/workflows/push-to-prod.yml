@@ -1,0 +1,22 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  DeployToRegistry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Docker Build & Push Action
+        uses: mr-smithers-excellent/docker-build-push@v5.6
+        with:
+          image: cyberpsych0siis/dockervm
+          tags: latest
+          registry: thallosaurus.de
+          dockerfile: Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Notify Production Server
+        uses: wei/curl@v1
+        with:
+          args: 
+            "-H 'Authorization: Bearer ${{ secrets.WATCHTOWER_UPDATE_TOKEN }}' ${{ secrets.WATCHTOWER_UPDATE_URL }}"
