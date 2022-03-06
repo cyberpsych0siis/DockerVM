@@ -19,7 +19,7 @@ function createSocket() {
           const msg_ = JSON.parse(data.data.toString());
           if (msg_.type === "connect") {
             circle = true;
-            logElem.innerText += "<a href='http://" location.host + msg_.uuid + "'>Click here</a>";
+            logElem.innerHTML += "<br><a href='http://" + location.host + msg_.uuid + "'>Click here</a>";
           }
           catch(e) {
             msg = await data.data.toString(); //you can never be sure
