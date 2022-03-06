@@ -70,11 +70,13 @@ export default class DockerClient {
         
         if (cbUrl) {
             console.log(cbUrl);
+
+            const BASE_URI = this.addr.split(".")[0];
             
             properties.Env = [
                 `CALLBACK_ENDPOINT=${cbUrl}`,
                 `ENDPOINT_URI=${this.addr}`,
-                `ENDPOINT_BASE_URI=${"/" + this.addr.split(".")[0]}`
+                `ENDPOINT_BASE_URI=/${BASE_URI}`
             ];
 
             // properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
@@ -100,10 +102,10 @@ export default class DockerClient {
 
                 console.log("[DockerClient] Attaching new Container to " + this.addr);
 
-                exec.start({ hijack: true, stdin: true }, (err, stream) => {
+                exec.start({ hijack: true, stdin: true, stdout: true, stderr: true }, (err, stream) => {
                     if (pipe) {
                         pipe.pipe(stream);
-                        this.docker.modem.demuxStream(stream, pipe, process.stderr);
+                        this.docker.modem.demuxStream(stream, pipe, pipe);
                     }
                 });
 
