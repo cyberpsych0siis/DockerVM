@@ -21,14 +21,15 @@ function createSocket() {
             circle = true;
             logElem.innerHTML += "<br><a href='http://" + location.host + msg_.uuid + "'>Click here</a>";
           }
-          catch(e) {
-            msg = await data.data.toString(); //you can never be sure
-           logElem.innerText += msg + "\n";
-          }
+        }
+        catch (e) {
+          msg = await data.data.toString(); //you can never be sure
+          logElem.innerText += msg + "\n";
+        }
         break;
     }
   }
-  
+
   s.onclose = () => {
     circle = false;
   }
@@ -48,7 +49,7 @@ function send(cmd) {
 /* window.onload = () => {
 } */
 
-(function() {
+(function () {
   window.addEventListener("load", (e) => {
     socket = createSocket();
   });
