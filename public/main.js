@@ -12,13 +12,21 @@ function createSocket() {
       case "object":
         //is blob
         msg = await data.data.text();
-        circle = true;
+        //circle = true;
         break;
       case "string":
-        msg = await data.data.toString(); //you can never be sure
+        try {
+          const msg_ = JSON.parse(data.data.toString());
+          if (msg_.type === "connect") {
+            circle = true;
+            logElem.innerText += "<a href='http://" location.host + msg_.uuid + "'>Click here</a>";
+          }
+          catch(e) {
+            msg = await data.data.toString(); //you can never be sure
+           logElem.innerText += msg + "\n";
+          }
         break;
     }
-    logElem.innerText += msg + "\n";
   }
   
   s.onclose = () => {
