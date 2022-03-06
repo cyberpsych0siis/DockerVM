@@ -112,7 +112,7 @@ export default (
                         // websocket.send("New Connection: " + dClient.addr)
                         websocket.send(JSON.stringify({
                           "type": "connect",
-                            "addr": dClient.addr
+                            "uuid": dClient.addr.split(".")[0]
                         }));
                     })
                     .catch((err) => {
