@@ -110,7 +110,10 @@ export default (
                 dClient.start(websocketStream(websocket), `${os.hostname()}:${(process.env.WEBSOCKET_PORT ?? 8085)}`)
                     .then(() => {
                         // websocket.send("New Connection: " + dClient.addr)
-                        websocket.send("Starting your instance... " + dClient.addr);
+                        websocket.send(JSON.stringify({
+                          "type": "connect",
+                            "addr": dClient.addr
+                        }));
                     })
                     .catch((err) => {
                         dClient.stop();
