@@ -73,7 +73,7 @@ export default class DockerClient {
             
             properties.Env = [
                 `CALLBACK_ENDPOINT=${cbUrl}`,
-                `ENDPOINT_URI=${this.addr}`
+                `ENDPOINT_URI=${"/" + this.addr.split(".")[0]}`
             ];
 
             // properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
