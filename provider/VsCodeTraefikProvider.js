@@ -18,7 +18,7 @@ export default class VsCodeTraefikProvider extends LabelProvider {
                 "traefik.port": "8080",
                 ["traefik.http.routers." + containerName + ".middlewares"]: "auth_then_strip@file,vscode-uuid-strip@file,errorcats@docker",
                 ["traefik.http.routers." + containerName + ".entrypoints"]: "web",
-                ["traefik.http.routers." + containerName + ".rule"]: "Host(`" + reachableAddress + "`) || PathPrefix(`/" + uuid + "`)"
+                ["traefik.http.routers." + containerName + ".rule"]: "Host(`" + reachableAddress + "`) || Path(`/" + uuid + "`)"
             },
         }
     }
