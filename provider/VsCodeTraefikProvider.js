@@ -10,7 +10,7 @@ export default class VsCodeTraefikProvider extends LabelProvider {
      */
     getProperties(containerName, reachableAddress) {
         return {
-            Image: "chanchal/vscode-server",
+            Image: "vyberpsych0siis/code-server",
             //Cmd: ["/opt/code-server", "--port", "8080"],
             Labels: {
                 "traefik.enable": "true",
