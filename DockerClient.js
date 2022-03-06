@@ -97,7 +97,7 @@ export default class DockerClient {
     async start(pipe, callbackUrl) {
         this.docker = await this.createContainer(callbackUrl);
         return this.docker.start((data) => {
-            this.docker.exec({ Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
+            this.docker.exec({ Cmd: [this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
                 if (err) throw err;
 
                 console.log("[DockerClient] Attaching new Container to " + this.addr);
