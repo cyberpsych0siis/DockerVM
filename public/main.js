@@ -12,12 +12,17 @@ function createSocket() {
       case "object":
         //is blob
         msg = await data.data.text();
+        circle = true;
         break;
       case "string":
         msg = await data.data.toString(); //you can never be sure
         break;
     }
     logElem.innerText += msg + "\n";
+  }
+  
+  s.onclose = () => {
+    circle = false;
   }
 
   s.onerror = err => {
