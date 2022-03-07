@@ -2,7 +2,7 @@ var socket;
 
 function createSocket() {
   // let s = new WebSocket("ws://" + location.host + "/");
-  let s = new WebSocket("ws://" + location.host + location.pathname + "/");
+  let s = new WebSocket("ws://" + location.host + location.pathname + '/');
 
   s.onmessage = async data => {
     console.log(data);
