@@ -11,7 +11,7 @@ export default class VsCodeTraefikProvider extends LabelProvider {
     getProperties(containerName, reachableAddress) {
         const uuid = reachableAddress.split(".")[0];
         return {
-            Image: "cyberpsych0siis/code-server",
+            Image: "thallosaurus.de/cyberpsych0siis/code-server",
             //Cmd: ["/opt/code-server", "--port", "8080"],
             Labels: {
                 "traefik.enable": "true",
