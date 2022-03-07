@@ -7,6 +7,7 @@ import VncTraefikProvider, { NoVncTraefikProvider } from '../provider/VncTraefik
 import RdpTraefikProvider from '../provider/RdpTraefikProvider.js';
 
 import os from 'os';
+import VsCodeTraefikProvider from '../provider/VsCodeTraefikProvider.js';
 
 function getProviderByMessage(msg) {
     console.log(msg);
@@ -14,17 +15,20 @@ function getProviderByMessage(msg) {
 
     const s = msg.split(" ");
     switch (s[1]) {
+        case "vscode":
+            return new VsCodeTraefikProvider();
         case "http":
             return new HttpTraefikProvider();
 
-        case "vnc":
-            return new VncTraefikProvider();
+        // case "vnc":
+            // return new VncTraefikProvider();
 
-        case "rdp":
-            return new RdpTraefikProvider();
+        // case "rdp":
+            // return new RdpTraefikProvider();
 
-        case "novnc":
-            return new NoVncTraefikProvider();
+        // case "novnc":
+            // return new NoVncTraefikProvider();
+
 
         default:
             throw new Error("Unknown Provider specified");
@@ -106,7 +110,10 @@ export default (
                 dClient.start(websocketStream(websocket), `${os.hostname()}:${(process.env.WEBSOCKET_PORT ?? 8085)}`)
                     .then(() => {
                         // websocket.send("New Connection: " + dClient.addr)
-                        websocket.send("Starting your instance... " + dClient.addr);
+                        websocket.send(JSON.stringify({
+                          "type": "connect",
+                            "uuid": dClient.addr.split(".")[0]
+                        }));
                     })
                     .catch((err) => {
                         dClient.stop();

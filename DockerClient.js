@@ -70,10 +70,13 @@ export default class DockerClient {
         
         if (cbUrl) {
             console.log(cbUrl);
+
+            const BASE_URI = this.addr.split(".")[0];
             
             properties.Env = [
                 `CALLBACK_ENDPOINT=${cbUrl}`,
-                `ENDPOINT_URI=${this.addr}`
+                `ENDPOINT_URI=${this.addr}`,
+                `ENDPOINT_BASE_URI=/${BASE_URI}`
             ];
 
             // properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
@@ -94,15 +97,15 @@ export default class DockerClient {
     async start(pipe, callbackUrl) {
         this.docker = await this.createContainer(callbackUrl);
         return this.docker.start((data) => {
-            this.docker.exec({ Cmd: ['/bin/sh', '-c', this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
+            this.docker.exec({ Cmd: [this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
                 if (err) throw err;
 
                 console.log("[DockerClient] Attaching new Container to " + this.addr);
 
-                exec.start({ hijack: true, stdin: true }, (err, stream) => {
+                exec.start({ hijack: true, stdin: true, stdout: true, stderr: true }, (err, stream) => {
                     if (pipe) {
                         pipe.pipe(stream);
-                        this.docker.modem.demuxStream(stream, pipe, process.stderr);
+                        this.docker.modem.demuxStream(stream, pipe, pipe);
                     }
                 });
 

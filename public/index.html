@@ -1,21 +1,35 @@
+<!DOCTYPE html>
 <html>
+
 <head>
-<title>Websocket Test</title>
-<script src="/main.js"></script>
-<script>
-function sendMessage() {
-  let msg = document.getElementById("msg").value;
-  send(msg);
-}
-</script>
+    <title>Cyberpsych0siis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+    </style>
+    <link rel="stylesheet" href="assets/cyberpsycho.css">
+    <link rel="stylesheet" href="assets/glitch.css">
+    <link rel="stylesheet" href="assets/page.css">
+
+    <script src="assets/anim.js"></script>
+    <script src="/vm/main.js"></script>
 </head>
 
 <body>
-  <h1>It works! :)</h1>
-  <p><input type='button' onclick='startNginx()' value='Start NGINX (Demo)'></p>
-  <p><input type='button' onclick='startNoVnc()' value='Start NoVNC Gateway (Lubuntu - Demo)'></p>
-  <p><input type='button' onclick='startVnc()' value='Start VNC (Demo)'></p>
-  <p><input type='button' onclick='startRdp()' value='Start XRDP-Xfce (Demo)'></p>
-  <pre id="log"></pre>
+    <div id="example" class="center">
+        <canvas id="bganim"></canvas>
+        <div class="card">
+
+            <!-- <h1 class="glitch" data-text="cyberpsych0siis">cyberpsych0siis</h1> -->
+            <h1>Start your Instance here</h1>
+            <p>
+                <input type="button" onclick="startVscode()" value="Start VSCode">
+            </p>
+            <p id="linkAnchor">
+
+            </p>
+        </div>
+    </div>
 </body>
+
 </html>
