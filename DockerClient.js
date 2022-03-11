@@ -137,9 +137,7 @@ export default class DockerClient {
      * @returns
      */
     async remove() {
-        // if (this.docker != null) {
         return await this.docker.remove();
-        // }
     }
 }
 
@@ -159,6 +157,3 @@ export class LabelProvider {
 
     }
 }
-
-/* exports.default = DockerClient;
-exports.LabelProvider = LabelProvider; */
