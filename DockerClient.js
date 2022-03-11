@@ -3,12 +3,15 @@ import Docker from 'dockerode';
 // const { uuid } = require("uuidv4");
 import { uuid } from 'uuidv4';
 
-// import { Message } from './routes/WebSocketRoute.js';
-
-// import os from 'os';
-
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
+
+var auth = {
+    username: process.env.DOCKER_REGISTRY_USERNAME,
+    password: process.env.DOCKER_REGISTRY_PASSWORD,
+    auth: '',
+    email: process.env.DOCKER_REGISTRY_EMAIL
+};
 
 export default class DockerClient {
 
@@ -80,7 +83,9 @@ export default class DockerClient {
     pullImage(logPipe, JsonTemplate) {
         return new Promise((res, rej) => {
 
-            this.dockerClient.pull(this.providerProps.Image, /* {authconfig: auth}, */(err, stream) => {
+            let auth = this.providerProps.private ? {authconfig: auth} : {};
+
+            this.dockerClient.pull(this.providerProps.Image, (err, stream) => {
                 // streaming output from pull...
                 if (err) {
                     // debugger;
@@ -147,6 +152,8 @@ export default class DockerClient {
 }
 
 export class LabelProvider {
+
+    private = false;
 
     /**
      * Should return options on how the element is connected to the proxy
