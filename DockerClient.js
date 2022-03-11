@@ -81,6 +81,7 @@ export default class DockerClient {
 
         Object.assign(properties, this.providerProps);   //assigns the provider properties to the container properties
 
+
         return this.dockerClient.createContainer(properties);
     }
 
@@ -122,6 +123,7 @@ export default class DockerClient {
     async start() {
         this.docker = await this.createContainer();
 
+
         return new Promise((res, rej) => {
             this.docker.start((err, data) => {
                 if (err) console.log(err);
@@ -133,6 +135,7 @@ export default class DockerClient {
                 }, (err, s) => {
                     if (err) rej(err);
                     res(s);
+
                 });
             });
         });

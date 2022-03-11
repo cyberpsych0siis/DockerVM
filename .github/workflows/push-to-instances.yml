@@ -1,0 +1,40 @@
+name: GitHub Actions Demo
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+jobs:
+  DeployToRegistry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.1
+      - name: Running on the default branch.
+        if: steps.branch-name.outputs.current_branch == 'main'
+        run: echo "Flipping Debug Switch to OFF"
+        env:
+          DEBUG: 0
+        # Outputs: "Running on default: main".
+      - name: Docker Build & Push Action
+        uses: mr-smithers-excellent/docker-build-push@v5.6
+        with:
+          image: cyberpsych0siis/dockervm
+          tags: ${{ steps.branch-name.outputs.current_branch }}
+          registry: thallosaurus.de
+          buildArgs: DEBUG=$DEBUG
+          dockerfile: Dockerfile
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Notify Production Server
+        uses: wei/curl@v1
+        with:
+          args: 
+            "-H 'Authorization: Bearer ${{ secrets.WATCHTOWER_UPDATE_TOKEN }}' ${{ secrets.WATCHTOWER_UPDATE_URL }}"
