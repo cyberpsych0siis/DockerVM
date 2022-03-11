@@ -88,12 +88,11 @@ export default class DockerClient {
     pullImage(logPipe, JsonTemplate) {
         return new Promise((res, rej) => {
 
-            this.dockerClient.pull(this.providerProps.Image, {authconfig: auth}, (err, stream) => {
+            this.dockerClient.pull(this.providerProps.Image, /* {authconfig: auth}, */ (err, stream) => {
                 // streaming output from pull...
                 if (err) throw err;
                 console.log(stream);
 
-                
                 const onFinished = (err, output) => {
                     // console.log(output);
                     if (err) rej(err);
