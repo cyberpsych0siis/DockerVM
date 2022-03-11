@@ -20,13 +20,13 @@ function getProviderByMessage(msg) {
             return new HttpTraefikProvider();
 
         // case "vnc":
-            // return new VncTraefikProvider();
+        // return new VncTraefikProvider();
 
         // case "rdp":
-            // return new RdpTraefikProvider();
+        // return new RdpTraefikProvider();
 
         // case "novnc":
-            // return new NoVncTraefikProvider();
+        // return new NoVncTraefikProvider();
 
 
         default:
@@ -85,7 +85,7 @@ export default (
                     });
             }
         });
-        websocket.on("message", (data) => {
+        websocket.on("message", async (data) => {
             console.log("[WebSocket Client] " + data);
 
             try {
@@ -94,19 +94,22 @@ export default (
 
                 dClient.pullImage(websocketStream(websocket), DockerPullLogMessage)
                 .then(() => {
-                    return dClient.start();
-                }).then((logStream) => {
-                        logStream.on("data", d => {
-                            // console.log();
-                            websocket.send(JSON.stringify(new DockerLogMessage(d.toString())));
+                    dClient.start()
+                        .then((logStream) => {
+                            logStream.on("data", d => {
+                                // console.log();
+                                websocket.send(JSON.stringify(new DockerLogMessage(d.toString())));
+                            });
+                        })
+                        .catch((err) => {
+                            dClient.stop();
+                            dClient.remove();
+                            console.error(err);
+                            websocket.send(JSON.stringify(new WebsocketError(err)));
                         });
-
-                    })
-                    .catch((err) => {
-                        dClient.stop();
-                        dClient.remove();
-                        console.error(err);
+                    }).catch(err => {
                         websocket.send(JSON.stringify(new WebsocketError(err)));
+                        console.error(err);
                     });
             } catch (e) {
                 websocket.send(JSON.stringify(new WebsocketError(e)));
