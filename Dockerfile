@@ -9,5 +9,5 @@ LABEL traefik.http.routers.mainpage.entrypoints=web
 LABEL traefik.port=8085
 COPY . .
 RUN yarn
-CMD ["yarn", "prod"]
+CMD ["yarn", "start"]
 EXPOSE 8085

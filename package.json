@@ -17,7 +17,7 @@
   "scripts": {
     "test": "echo 'All tests passed :DD' && exit 0",
     "start": "node .",
-    "prod": "npx nodemon --inspect=0.0.0.0 ."
+    "dev": "npx nodemon --inspect=0.0.0.0 ."
   },
   "devDependencies": {
     "jasmine": "^4.0.2",

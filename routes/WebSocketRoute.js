@@ -64,6 +64,8 @@ export default (
     websocketServer.on('connection', function connect(websocket) {
         console.log("[WebSocket] New Connection");
         let dClient = null;
+        const stream = websocketStream(websocket);
+        let closed = false;
 
         websocket.send("Connection established");
         console.log("[WebSocket] connection opened");
@@ -83,9 +85,11 @@ export default (
                 dClient.stop()
                     .then((container) => {
                         auxContainer = container;
+                        // closed = true;
+                        stream.end();
                     })
                     .catch((err) => {
-                        websocket.send("[WebSocket] connection closed");
+                        // websocket.send("[WebSocket] connection closed");
                         console.error(err);
                     })
                     .finally(() => {
@@ -102,23 +106,57 @@ export default (
                 dClient = new DockerClient(provider);
 
                 cbStack[dClient.name] = websocket;
+                // const stream = websocketStream(websocket);
 
-                dClient.start(websocketStream(websocket), `${os.hostname()}:${(process.env.WEBSOCKET_PORT ?? 8085)}`)
-                    .then(() => {
-                        // websocket.send("New Connection: " + dClient.addr)
-                        websocket.send("Starting your instance... " + dClient.addr);
+                dClient.start()
+                    .then((logStream) => {
+                        logStream.on("data", d => {
+                            // console.log(stream);
+                            let chunk = JSON.stringify(new DockerLogMessage(d.toString()));
+                            if (stream.writable) {
+                                stream.write(Buffer.from(chunk));
+                            }
+                        });
                     })
                     .catch((err) => {
                         dClient.stop();
                         dClient.remove();
                         console.error(err);
-                        websocket.send(err.toString());
+                        websocket.send(JSON.stringify(new WebsocketError(err)));
                     });
             } catch (e) {
-                websocket.send(e.toString());
+                websocket.send(JSON.stringify(new WebsocketError(err)));
             }
         });
     });
 
     return websocketServer;
 };
+
+export class Message {
+    constructor(type, msg) {
+        this.type = type;
+        this.msg = msg;
+    }
+}
+
+class InstanceStartedMessage extends Message {
+    constructor(url) {
+        super("conn", url);
+    }
+}
+
+class WebsocketError extends Message {
+    constructor(err) {
+        super("err", err.message);
+    }
+}
+
+class DockerLogMessage {
+    constructor(msg) {
+        // console.log(msg);
+        this.type = "log",
+            this.msg = msg;
+        // super("msg", msg);
+    }
+}
