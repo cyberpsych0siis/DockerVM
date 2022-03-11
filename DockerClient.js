@@ -10,14 +10,6 @@ import { uuid } from 'uuidv4';
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
 
-const auth = {
-    username: 'circleci',
-    password: 'circleci',
-    auth: '',
-    email: 'your@email.email',
-    serveraddress: 'https://thallosaurus.de'
-  };
-
 export default class DockerClient {
 
     options = {
