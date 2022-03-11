@@ -68,7 +68,7 @@ export default (
 
             let auxContainer;
 
-            if (dClient != null) {
+            if (dClient.docker != null) {
                 dClient.stop()
                     .then((container) => {
                         auxContainer = container;
@@ -81,7 +81,9 @@ export default (
                     })
                     .finally(() => {
                         //cleanup
-                        dClient.remove();
+                        // if (dClient.docker) {
+                            dClient.remove();
+                        // }
                     });
             }
         });

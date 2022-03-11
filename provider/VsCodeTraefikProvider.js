@@ -1,6 +1,7 @@
 import { LabelProvider } from "../DockerClient.js";
 
 export default class VsCodeTraefikProvider extends LabelProvider {
+    private = true;
     /**
      * 
      * @param {string} containerName 
