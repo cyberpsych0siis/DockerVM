@@ -55,7 +55,7 @@ export default (
 ) => {
     const websocketServer = new WebSocketServer({
         noServer: true,
-        path: "/socket",
+        path: "/",
     });
 
     expressServer.on("upgrade", (request, socket, head) => {
