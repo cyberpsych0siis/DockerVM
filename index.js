@@ -1,17 +1,10 @@
 
 import logger from 'morgan';
-import { parse } from 'url';
-
 import WebSocketRoute, { callbackRoute, serveBootstrapRoute } from './routes/WebSocketRoute.js';
 import HealthcheckRoute from './routes/HealthcheckRoute.js';
-
 import express from 'express';
 import expressStatic from 'express-static';
 import process from 'process';
-
-
-import axios from 'axios';
-import FrontendRoute from './routes/FrontendRoute.js';
 
 (function () {
     const app = express();

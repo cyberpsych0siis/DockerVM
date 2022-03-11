@@ -3,10 +3,20 @@ import Docker from 'dockerode';
 // const { uuid } = require("uuidv4");
 import { uuid } from 'uuidv4';
 
+// import { Message } from './routes/WebSocketRoute.js';
+
 // import os from 'os';
 
 // Default Payload to be executed when no bootstrap command was found in Environment $BOOTSTRAP
 const BOOTSTRAP_NOT_DEFINED = "echo 'No command defined. Define $BOOTSTRAP.' && exit 1";
+
+const auth = {
+    username: 'circleci',
+    password: 'circleci',
+    auth: '',
+    email: 'your@email.email',
+    serveraddress: 'https://thallosaurus.de'
+  };
 
 export default class DockerClient {
 
@@ -27,7 +37,9 @@ export default class DockerClient {
         websocket: null,
 
         //the container id that should be used instead of a created container - UNUSED
-        containerId: null
+        containerId: null,
+
+        providerProps: null
     }
 
     constructor(
@@ -42,9 +54,14 @@ export default class DockerClient {
         this.dockerClient = new Docker();
         this.addr = `${uuid()}.${this.options.subdomain}`;
         this.name = this.addr.split("-")[0];    //takes the first part of the uuid v4
+        this.providerProps = this.provider?.getProperties(
+            String(this.name),
+            String(this.addr)
+        );
     }
 
-    async createContainer(cbUrl) {
+    async createContainer() {
+
         let properties = {
             Hostname: this.name,
             AttachStdin: false,
@@ -62,28 +79,37 @@ export default class DockerClient {
             }
         };
 
-        Object.assign(properties, this.provider?.getProperties(
-            String(this.name),
-            String(this.addr)
-        ));   //assigns the provider properties to the container properties
+        Object.assign(properties, this.providerProps);   //assigns the provider properties to the container properties
 
-        
-        if (cbUrl) {
-            console.log(cbUrl);
-
-            const BASE_URI = this.addr.split(".")[0];
-            
-            properties.Env = [
-                `CALLBACK_ENDPOINT=${cbUrl}`,
-                `ENDPOINT_URI=${this.addr}`,
-                `ENDPOINT_BASE_URI=/${BASE_URI}`
-            ];
-
-            // properties.Cmd = `curl ${cbUrl}/bootstrap | sh -`;
-        }
-        console.log(properties);
 
         return this.dockerClient.createContainer(properties);
+    }
+
+    pullImage(logPipe, JsonTemplate) {
+        return new Promise((res, rej) => {
+
+            this.dockerClient.pull(this.providerProps.Image, {authconfig: auth}, (err, stream) => {
+                // streaming output from pull...
+                if (err) throw err;
+                console.log(stream);
+
+                
+                const onFinished = (err, output) => {
+                    // console.log(output);
+                    if (err) rej(err);
+                    res();
+                }
+
+                const onProgress = (event) => {
+                    if (logPipe.writable) {
+                        const pkg = new JsonTemplate(event);
+                        logPipe.write(JSON.stringify(pkg));
+                    }
+                }
+
+                this.dockerClient.modem.followProgress(stream, onFinished, onProgress);
+            });
+        });
     }
 
     async stop() {
@@ -94,34 +120,35 @@ export default class DockerClient {
         }
     }
 
-    async start(pipe, callbackUrl) {
-        this.docker = await this.createContainer(callbackUrl);
-        return this.docker.start((data) => {
-            this.docker.exec({ Cmd: [this.options.bootstrapCmd], AttachStdin: true, AttachStdout: true }, (err, exec) => {
-                if (err) throw err;
+    async start() {
+        this.docker = await this.createContainer();
 
-                console.log("[DockerClient] Attaching new Container to " + this.addr);
 
-                exec.start({ hijack: true, stdin: true, stdout: true, stderr: true }, (err, stream) => {
-                    if (pipe) {
-                        pipe.pipe(stream);
-                        this.docker.modem.demuxStream(stream, pipe, pipe);
-                    }
+        return new Promise((res, rej) => {
+            this.docker.start((err, data) => {
+                if (err) console.log(err);
+
+                this.docker.logs({
+                    "follow": true,
+                    "stdout": true,
+                    "stderr": true
+                }, (err, s) => {
+                    if (err) rej(err);
+                    res(s);
+
                 });
-
-            })
+            });
         });
     }
 
     /**
      *
-     * @deprecated
      * @returns
      */
     async remove() {
-        if (this.docker != null) {
-            return await this.docker.remove();
-        }
+        // if (this.docker != null) {
+        return await this.docker.remove();
+        // }
     }
 }
 
