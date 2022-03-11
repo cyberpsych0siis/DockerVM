@@ -1,16 +1,19 @@
 var socket;
 
 function createSocket() {
-  let s = new WebSocket("ws://" + location.host + "/socket");
+  // let s = new WebSocket("ws://" + location.host + "/");
+  let s = new WebSocket("ws://" + location.host + location.pathname + '/');
 
   s.onmessage = async data => {
     console.log(data);
     // let logElem = document.getElementById("log");
     let logArea = document.getElementById("logarea");
+
     let msg = "no message";
     switch (typeof await data.data) {
       case "object":
         //is blob
+
         console.log("blob");
         let d = await data.data.text()
         msg = createLogEntry(d);
@@ -25,6 +28,7 @@ function createSocket() {
     // logElem.innerText += msg + "\n";
     logArea.appendChild(msg);
     logArea.scrollTo(0, logArea.scrollHeight);
+
   }
 
   s.onerror = err => {
@@ -35,12 +39,18 @@ function createSocket() {
 }
 
 function send(cmd) {
+  // if (!socket) socket = createSocket();
   socket.send(cmd);
 }
 
-window.onload = () => {
-  socket = createSocket();
-}
+/* window.onload = () => {
+} */
+
+(function () {
+  window.addEventListener("load", (e) => {
+    socket = createSocket();
+  });
+})();
 
 function startNginx() {
   send("start http");
