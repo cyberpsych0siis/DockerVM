@@ -2,6 +2,7 @@
 <head>
 <title>Websocket Test</title>
 <script src="/main.js"></script>
+<link rel="stylesheet" href="style.css">
 <script>
 function sendMessage() {
   let msg = document.getElementById("msg").value;
@@ -17,5 +18,8 @@ function sendMessage() {
   <p><input type='button' onclick='startVnc()' value='Start VNC (Demo)'></p>
   <p><input type='button' onclick='startRdp()' value='Start XRDP-Xfce (Demo)'></p>
   <pre id="log"></pre>
+
+  <div id="logarea">
+  </div>
 </body>
 </html>

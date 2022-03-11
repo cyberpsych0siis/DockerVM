@@ -64,10 +64,11 @@ export default (
     websocketServer.on('connection', function connect(websocket) {
         console.log("[WebSocket] New Connection");
         let dClient = null;
-        const stream = websocketStream(websocket);
-        let closed = false;
+        // const stream = websocketStream(websocket);
+        // let closed = false;
 
-        websocket.send("Connection established");
+        // websocket.send("Connection established");
+        websocket.send(JSON.stringify(new ConnectionEstablishedMessage()));
         console.log("[WebSocket] connection opened");
 
         //if our webserver emits an error, print it to stderr
@@ -86,7 +87,7 @@ export default (
                     .then((container) => {
                         auxContainer = container;
                         // closed = true;
-                        stream.end();
+                        // stream.end();
                     })
                     .catch((err) => {
                         // websocket.send("[WebSocket] connection closed");
@@ -105,17 +106,13 @@ export default (
                 let provider = getProviderByMessage(data.toString());
                 dClient = new DockerClient(provider);
 
-                cbStack[dClient.name] = websocket;
-                // const stream = websocketStream(websocket);
-
-                dClient.start()
-                    .then((logStream) => {
+                dClient.pullImage(websocketStream(websocket), DockerPullLogMessage)
+                .then(() => {
+                    return dClient.start();
+                }).then((logStream) => {
                         logStream.on("data", d => {
-                            // console.log(stream);
-                            let chunk = JSON.stringify(new DockerLogMessage(d.toString()));
-                            if (stream.writable) {
-                                stream.write(Buffer.from(chunk));
-                            }
+                            // console.log();
+                            websocket.send(JSON.stringify(new DockerLogMessage(d.toString())));
                         });
                     })
                     .catch((err) => {
@@ -125,7 +122,7 @@ export default (
                         websocket.send(JSON.stringify(new WebsocketError(err)));
                     });
             } catch (e) {
-                websocket.send(JSON.stringify(new WebsocketError(err)));
+                websocket.send(JSON.stringify(new WebsocketError(e)));
             }
         });
     });
@@ -155,8 +152,22 @@ class WebsocketError extends Message {
 class DockerLogMessage {
     constructor(msg) {
         // console.log(msg);
-        this.type = "log",
-            this.msg = msg;
+        this.type = "logchunk";
+        this.msg = msg;
         // super("msg", msg);
+    }
+}
+
+class DockerPullLogMessage extends Message {
+    constructor(msg) {
+        // this.type = "pullchunk";
+        super("pullchunk", msg.status);
+        // Object.assign(this, msg);
+    }
+}
+
+class ConnectionEstablishedMessage extends Message {
+    constructor() {
+        super("hello", "Connection established");
     }
 }

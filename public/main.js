@@ -5,18 +5,26 @@ function createSocket() {
 
   s.onmessage = async data => {
     console.log(data);
-    let logElem = document.getElementById("log");
+    // let logElem = document.getElementById("log");
+    let logArea = document.getElementById("logarea");
     let msg = "no message";
     switch (typeof await data.data) {
       case "object":
         //is blob
-        msg = await data.data.text();
+        console.log("blob");
+        let d = await data.data.text()
+        msg = createLogEntry(d);
+        // let json = JSON.parse(d);
         break;
       case "string":
-        msg = await data.data.toString(); //you can never be sure
+        console.log("text");
+        let f = await data.data.toString(); //you can never be sure
+        msg = createLogEntry(f);
         break;
     }
-    logElem.innerText += msg + "\n";
+    // logElem.innerText += msg + "\n";
+    logArea.appendChild(msg);
+    logArea.scrollTo(0, logArea.scrollHeight);
   }
 
   s.onerror = err => {
@@ -48,4 +56,20 @@ function startNoVnc() {
 
 function startRdp() {
   send("start rdp");
+}
+
+function createLogEntry(obj) {
+  console.log(obj);
+  let m = JSON.parse(obj);
+  let e = document.createElement("div");
+  e.classList.add("log", m.type);
+  switch (m.type) {
+/*     case "pullchunk":
+      e.innerHTML = m.status;
+      break; */
+    default:
+      e.innerHTML = m.msg;
+      break;
+  }
+  return e;
 }
