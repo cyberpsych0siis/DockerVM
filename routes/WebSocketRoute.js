@@ -6,7 +6,6 @@ import HttpTraefikProvider from '../provider/HttpTraefikProvider.js';
 import VncTraefikProvider, { NoVncTraefikProvider } from '../provider/VncTraefikProvider.js';
 import RdpTraefikProvider from '../provider/RdpTraefikProvider.js';
 
-import os from 'os';
 import VsCodeTraefikProvider from '../provider/VsCodeTraefikProvider.js';
 
 function getProviderByMessage(msg) {
@@ -35,27 +34,12 @@ function getProviderByMessage(msg) {
     }
 }
 
-const cbStack = {};
-
-export const callbackRoute = (req, res) => {
-    // console.log(req.body);
-    // console.log("Machine ID " + req.body.id + " is ready");
-    // console.log(cbStack);
-    cbStack[req.body.id].send(req.body.id);
-    res.status(200);
-}
-
-export const serveBootstrapRoute = (req, res) => {
-    res.setHeader("Content-Type", "plain/text");
-    res.send(`#!/bin/sh\nexport HOSTNAME = $(cat /etc/hostname) && curl -X POST $CALLBACK_ENDPOINT -d "id=$HOSTNAME" -d "payload=$ENDPOINT_URI"`);
-}
-
 export default (
     expressServer
 ) => {
     const websocketServer = new WebSocketServer({
         noServer: true,
-        path: "/socket",
+        path: "/",
     });
 
     expressServer.on("upgrade", (request, socket, head) => {
@@ -68,8 +52,6 @@ export default (
     websocketServer.on('connection', function connect(websocket) {
         console.log("[WebSocket] New Connection");
         let dClient = null;
-        // const stream = websocketStream(websocket);
-        // let closed = false;
 
         // websocket.send("Connection established");
         websocket.send(JSON.stringify(new ConnectionEstablishedMessage()));
