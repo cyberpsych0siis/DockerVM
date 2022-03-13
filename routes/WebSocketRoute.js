@@ -6,7 +6,6 @@ import HttpTraefikProvider from '../provider/HttpTraefikProvider.js';
 import VncTraefikProvider, { NoVncTraefikProvider } from '../provider/VncTraefikProvider.js';
 import RdpTraefikProvider from '../provider/RdpTraefikProvider.js';
 
-import os from 'os';
 import VsCodeTraefikProvider from '../provider/VsCodeTraefikProvider.js';
 
 function getProviderByMessage(msg) {
@@ -21,13 +20,13 @@ function getProviderByMessage(msg) {
             return new HttpTraefikProvider();
 
         // case "vnc":
-            // return new VncTraefikProvider();
+        // return new VncTraefikProvider();
 
         // case "rdp":
-            // return new RdpTraefikProvider();
+        // return new RdpTraefikProvider();
 
         // case "novnc":
-            // return new NoVncTraefikProvider();
+        // return new NoVncTraefikProvider();
 
 
         default:
@@ -35,27 +34,12 @@ function getProviderByMessage(msg) {
     }
 }
 
-const cbStack = {};
-
-export const callbackRoute = (req, res) => {
-    // console.log(req.body);
-    // console.log("Machine ID " + req.body.id + " is ready");
-    // console.log(cbStack);
-    cbStack[req.body.id].send(req.body.id);
-    res.status(200);
-}
-
-export const serveBootstrapRoute = (req, res) => {
-    res.setHeader("Content-Type", "plain/text");
-    res.send(`#!/bin/sh\nexport HOSTNAME = $(cat /etc/hostname) && curl -X POST $CALLBACK_ENDPOINT -d "id=$HOSTNAME" -d "payload=$ENDPOINT_URI"`);
-}
-
 export default (
     expressServer
 ) => {
     const websocketServer = new WebSocketServer({
         noServer: true,
-        path: "/socket",
+        path: "/", 
     });
 
     expressServer.on("upgrade", (request, socket, head) => {
@@ -69,7 +53,8 @@ export default (
         console.log("[WebSocket] New Connection");
         let dClient = null;
 
-        websocket.send("Connection established");
+        // websocket.send("Connection established");
+        websocket.send(JSON.stringify(new ConnectionEstablishedMessage()));
         console.log("[WebSocket] connection opened");
 
         //if our webserver emits an error, print it to stderr
@@ -83,49 +68,98 @@ export default (
 
             let auxContainer;
 
-            if (dClient != null) {
+            if (dClient.docker != null) {
                 dClient.stop()
                     .then((container) => {
                         auxContainer = container;
+                        // closed = true;
+                        // stream.end();
                     })
                     .catch((err) => {
-                        websocket.send("[WebSocket] connection closed");
+                        // websocket.send("[WebSocket] connection closed");
                         console.error(err);
                     })
                     .finally(() => {
                         //cleanup
-                        dClient.remove();
+                        // if (dClient.docker) {
+                            dClient.remove();
+                        // }
                     });
             }
         });
-        websocket.on("message", (data) => {
+        websocket.on("message", async (data) => {
             console.log("[WebSocket Client] " + data);
 
             try {
                 let provider = getProviderByMessage(data.toString());
                 dClient = new DockerClient(provider);
 
-                cbStack[dClient.name] = websocket;
-
-                dClient.start(websocketStream(websocket), `${os.hostname()}:${(process.env.WEBSOCKET_PORT ?? 8085)}`)
-                    .then(() => {
-                        // websocket.send("New Connection: " + dClient.addr)
-                        websocket.send(JSON.stringify({
-                          "type": "connect",
-                            "uuid": dClient.addr.split(".")[0]
-                        }));
-                    })
-                    .catch((err) => {
-                        dClient.stop();
-                        dClient.remove();
+                dClient.pullImage(websocketStream(websocket), DockerPullLogMessage)
+                .then(() => {
+                    dClient.start()
+                        .then((logStream) => {
+                            logStream.on("data", d => {
+                                // console.log();
+                                websocket.send(JSON.stringify(new DockerLogMessage(d.toString())));
+                            });
+                        })
+                        .catch((err) => {
+                            dClient.stop();
+                            dClient.remove();
+                            console.error(err);
+                            websocket.send(JSON.stringify(new WebsocketError(err)));
+                        });
+                    }).catch(err => {
+                        websocket.send(JSON.stringify(new WebsocketError(err)));
                         console.error(err);
-                        websocket.send(err.toString());
                     });
             } catch (e) {
-                websocket.send(e.toString());
+                websocket.send(JSON.stringify(new WebsocketError(e)));
             }
         });
     });
 
     return websocketServer;
 };
+
+export class Message {
+    constructor(type, msg) {
+        this.type = type;
+        this.msg = msg;
+    }
+}
+
+class InstanceStartedMessage extends Message {
+    constructor(url) {
+        super("conn", url);
+    }
+}
+
+class WebsocketError extends Message {
+    constructor(err) {
+        super("err", err.message);
+    }
+}
+
+class DockerLogMessage {
+    constructor(msg) {
+        // console.log(msg);
+        this.type = "logchunk";
+        this.msg = msg;
+        // super("msg", msg);
+    }
+}
+
+class DockerPullLogMessage extends Message {
+    constructor(msg) {
+        // this.type = "pullchunk";
+        super("pullchunk", msg.status);
+        // Object.assign(this, msg);
+    }
+}
+
+class ConnectionEstablishedMessage extends Message {
+    constructor() {
+        super("hello", "Connection established");
+    }
+}

@@ -1,0 +1,23 @@
+#logarea {
+    /* border: 1px solid black; */
+    height: 10em;
+    background-color: black;
+    overflow: overlay;
+}
+
+.log {
+    color: white;
+    font-family: monospace;
+}
+
+.log:hover {
+    background-color: lightslategrey;
+}
+
+.pullchunk::before {
+    content: "<PULL> ";
+}
+
+.logchunk::before {
+    content: "<CONT> ";
+}

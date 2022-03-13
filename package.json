@@ -5,7 +5,6 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "axios": "^0.26.0",
     "dockerode": "^3.3.1",
     "express": "^4.17.2",
     "express-static": "^1.2.6",
@@ -17,7 +16,7 @@
   "scripts": {
     "test": "echo 'All tests passed :DD' && exit 0",
     "start": "node .",
-    "prod": "npx nodemon --inspect=0.0.0.0 ."
+    "dev": "npx nodemon --inspect=0.0.0.0 ."
   },
   "devDependencies": {
     "jasmine": "^4.0.2",

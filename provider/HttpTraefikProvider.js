@@ -10,7 +10,7 @@ export default class HttpTraefikProvider extends LabelProvider {
      */
     getProperties(containerName, reachableAddress) {
         return {
-            Image: "nginx",
+            Image: "docker.io/nginx",
             Labels: {
                 "traefik.enable": "true",
                 "traefik.port": "80",

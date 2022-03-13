@@ -2,36 +2,33 @@ var socket;
 
 function createSocket() {
   // let s = new WebSocket("ws://" + location.host + "/");
-  let s = new WebSocket("ws://" + location.host + location.pathname + "/socket");
+  let s = new WebSocket("ws://" + location.host + location.pathname);
 
   s.onmessage = async data => {
     console.log(data);
-    let logElem = document.getElementById("linkAnchor");
+    // let logElem = document.getElementById("log");
+    let logArea = document.getElementById("logarea");
+
     let msg = "no message";
     switch (typeof await data.data) {
       case "object":
         //is blob
-        msg = await data.data.text();
-        //circle = true;
+
+        console.log("blob");
+        let d = await data.data.text()
+        msg = createLogEntry(d);
+        // let json = JSON.parse(d);
         break;
       case "string":
-        try {
-          const msg_ = JSON.parse(data.data.toString());
-          if (msg_.type === "connect") {
-            circle = true;
-            logElem.innerHTML += "<br><a href='http://" + location.host + "/" + msg_.uuid + "'>Click here</a>";
-          }
-        }
-        catch (e) {
-          msg = await data.data.toString(); //you can never be sure
-          logElem.innerText += msg + "\n";
-        }
+        console.log("text");
+        let f = await data.data.toString(); //you can never be sure
+        msg = createLogEntry(f);
         break;
     }
-  }
+    // logElem.innerText += msg + "\n";
+    logArea.appendChild(msg);
+    logArea.scrollTo(0, logArea.scrollHeight);
 
-  s.onclose = () => {
-    circle = false;
   }
 
   s.onerror = err => {
@@ -71,6 +68,18 @@ function startRdp() {
   send("start rdp");
 }
 
-function startVscode() {
-  send("start vscode");
+function createLogEntry(obj) {
+  console.log(obj);
+  let m = JSON.parse(obj);
+  let e = document.createElement("div");
+  e.classList.add("log", m.type);
+  switch (m.type) {
+/*     case "pullchunk":
+      e.innerHTML = m.status;
+      break; */
+    default:
+      e.innerHTML = m.msg;
+      break;
+  }
+  return e;
 }
