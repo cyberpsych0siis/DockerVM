@@ -39,7 +39,7 @@ export default (
 ) => {
     const websocketServer = new WebSocketServer({
         noServer: true,
-        path: "/",
+        path: "/", 
     });
 
     expressServer.on("upgrade", (request, socket, head) => {
