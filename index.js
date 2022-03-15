@@ -6,6 +6,15 @@ import process from "process";
 import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
+import session from "express-session";
+import redis from "redis";
+import connectRedis from "connect-redis";
+
+const redisStore = connectRedis(session);
+const client = redis.createClient({
+  host: "redis",
+});
+
 (function () {
   const app = express();
   enableWs(app);
@@ -19,6 +28,24 @@ import enableWs from "express-ws";
           return false;
         }
       },
+    })
+  );
+
+  app.use(
+    session({
+      secret: "ssshhhhh",
+      genid: function (req) {
+        return req.headers["x-session"];
+      },
+      // create new redis store.
+      store: new redisStore({
+        host: "localhost",
+        port: 6379,
+        client: client,
+        ttl: 260,
+      }),
+      saveUninitialized: false,
+      resave: false,
     })
   );
 
