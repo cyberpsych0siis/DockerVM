@@ -101,7 +101,7 @@ export default class DockerClient {
             rej(err);
             // return;
           } else {
-            console.log(stream);
+            // console.log(stream);
 
             const onFinished = (err, output) => {
               // console.log(output);
