@@ -8,6 +8,7 @@
     "dockerode": "^3.3.1",
     "express": "^4.17.2",
     "express-static": "^1.2.6",
+    "express-ws": "^5.0.2",
     "morgan": "^1.10.0",
     "uuidv4": "^6.2.12",
     "websocket-stream": "^5.5.2",

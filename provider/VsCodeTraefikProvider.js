@@ -1,6 +1,7 @@
 import { LabelProvider } from "./LabelProvider.js";
 export class VsCodeTraefikProvider extends LabelProvider {
   private = true;
+  Image = "thallosaurus.de/cyberpsych0siis/code-server";
   /**
    *
    * @param {string} containerName
@@ -11,7 +12,7 @@ export class VsCodeTraefikProvider extends LabelProvider {
   getProperties(containerName, reachableAddress) {
     const uuid = reachableAddress.split(".")[0];
     return {
-      Image: "thallosaurus.de/cyberpsych0siis/code-server",
+      Image: this.Image,
       //Cmd: ["/opt/code-server", "--port", "8080"],
       Labels: {
         "traefik.enable": "true",

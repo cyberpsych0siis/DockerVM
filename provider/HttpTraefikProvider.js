@@ -1,6 +1,7 @@
 import { LabelProvider } from "./LabelProvider.js";
 
 export class HttpTraefikProvider extends LabelProvider {
+  Image = "docker.io/nginx";
   /**
    *
    * @param {string} containerName
@@ -10,7 +11,7 @@ export class HttpTraefikProvider extends LabelProvider {
    */
   getProperties(containerName, reachableAddress) {
     return {
-      Image: "docker.io/nginx",
+      Image: this.Image,
       Labels: {
         "traefik.enable": "true",
         "traefik.port": "80",

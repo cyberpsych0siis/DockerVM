@@ -2,6 +2,7 @@
 import Docker from "dockerode";
 // const { uuid } = require("uuidv4");
 import { uuid } from "uuidv4";
+import { getProviderById } from "./provider/getProvider.js";
 // import VsCodeTraefikProvider from "./provider/VsCodeTraefikProvider,";
 
 // import VsCodeTraefikProvider from "../provider/VsCodeTraefikProvider.js";
@@ -17,6 +18,9 @@ var auth = {
   email: process.env.DOCKER_REGISTRY_EMAIL,
 };
 
+/**
+ * @deprecated use docker/Client.js
+ */
 export default class DockerClient {
   options = {
     //reads the docker host socket from the $DOCKER_HOST environment variable. Defaults to '/var/run/docker.sock'
@@ -37,11 +41,13 @@ export default class DockerClient {
     //the container id that should be used instead of a created container
     containerId: null,
 
+    provider: null,
+
     providerProps: null,
   };
 
   constructor(
-    provider, //discoverability provider
+    // provider, //discoverability provider
     options = {} //for external support
   ) {
     for (let key of Object.keys(options)) {
@@ -49,14 +55,17 @@ export default class DockerClient {
     }
 
     if (this.options.containerId != null) {
-      this.provider = LabelProvider.getProviderById("vscode");
-      this.addr = "<not implemented yet>"; //TOOD Get Label from Docker
-      //   this.name =
+      this.options.provider = getProviderById("http"); //TODO save used provider somewhere
+      this.uuid = this.options.containerId;
+      // this.provider = LabelProvider.getProviderById("vscode");
     } else {
-      this.provider = provider;
-      this.addr = `${uuid()}.${this.options.subdomain}`;
-      console.log("new Container: " + this.addr);
+      this.uuid = uuid();
     }
+
+    this.provider = this.options.provider;
+
+    this.addr = `${this.uuid}.${this.options.subdomain}`;
+    console.log("new Container: " + this.addr);
 
     this.dockerClient = new Docker();
     this.name = this.addr.split("-")[0]; //takes the first part of the uuid v4
@@ -67,24 +76,34 @@ export default class DockerClient {
   }
 
   async createContainer() {
-    let properties = {
-      Hostname: this.name,
-      AttachStdin: false,
-      AttachStdout: false,
-      AttachStderr: false,
-      Tty: true,
-      OpenStdin: false,
-      StdinOnce: false,
-      NetworkingConfig: {
-        EndpointsConfig: {
-          [this.options.networkId]: {},
+    if (this.options.containerId) {
+      console.log("My Container ID: " + this.options.containerId);
+      // debugger;
+      return this.getContainerByUuid(this.options.containerId);
+    } else {
+      let properties = {
+        name: this.uuid,
+        Hostname: this.name,
+        AttachStdin: false,
+        AttachStdout: false,
+        AttachStderr: false,
+        Tty: true,
+        OpenStdin: false,
+        StdinOnce: false,
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [this.options.networkId]: {},
+          },
         },
-      },
-    };
+      };
 
-    Object.assign(properties, this.providerProps); //assigns the provider properties to the container properties
+      Object.assign(properties, this.providerProps); //assigns the provider properties to the container properties
 
-    return this.dockerClient.createContainer(properties);
+      properties.Labels["com.rillo5000.provider"] =
+        this.provider.constructor.name;
+
+      return this.dockerClient.createContainer(properties);
+    }
   }
 
   pullImage(logPipe, JsonTemplate) {
@@ -157,6 +176,45 @@ export default class DockerClient {
           }
         );
       });
+    });
+  }
+
+  getContainerByUuid(id) {
+    return new Promise((res, rej) => {
+      // if (!isUuid(req.params.uuid)) {
+      // res.status(400).end();
+      // res.end();
+      // return;
+      // rej("invalid uuid");
+      // }
+
+      this.dockerClient.listContainers(
+        {
+          filters: {
+            // status: ["exited"],
+            name: [id],
+          },
+        },
+        (err, containers) => {
+          if (err) {
+            // res.send(err);
+            console.log(err);
+            rej(err);
+            // return;
+          }
+
+          if (containers.length == 1) {
+            // res.send(...containers);
+            res(...containers);
+            // return;
+          } else {
+            // res.send(JSON.stringify(new Error("invalid uuid")));
+            console.log(containers);
+            rej(new Error("container not found"));
+            // return;
+          }
+        }
+      );
     });
   }
 

@@ -3,9 +3,13 @@ import WebSocketRoute from "./routes/WebSocketRoute.js";
 import HealthcheckRoute from "./routes/HealthcheckRoute.js";
 import express from "express";
 import process from "process";
+import APIRoute from "./api/APIRoute.js";
+import enableWs from "express-ws";
 
 (function () {
   const app = express();
+  enableWs(app);
+
   app.use(
     logger("dev", {
       skip: function (req, res) {
@@ -20,9 +24,13 @@ import process from "process";
 
   app.use("/health", HealthcheckRoute);
 
-  app.get("/", (req, res) => {
-    res.send("Digga ich fress nen Besen wenn das jetzt angezeigt wird");
-  });
+  //   app.get("/api", (req, res) => {
+  // res.send("Digga ich fress nen Besen wenn das jetzt angezeigt wird");
+  //   });
+
+  //   app.get("/api", );
+
+  APIRoute(app);
 
   //our http server which handles websocket proxy and static
   const PORT = process.env.WEBSOCKET_PORT ?? 8085;
@@ -30,5 +38,5 @@ import process from "process";
     console.log("[WebSocket] Listening to port " + PORT);
   }); /*  */
 
-  WebSocketRoute(server, app);
+  //WebSocketRoute(server, app);
 })();

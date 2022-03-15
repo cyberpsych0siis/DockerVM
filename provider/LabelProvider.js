@@ -12,4 +12,13 @@ export class LabelProvider {
   }
 
   setWebsocket(ws) {}
+
+  getAuthentication() {
+    return {
+      username: process.env.DOCKER_REGISTRY_USERNAME,
+      password: process.env.DOCKER_REGISTRY_PASSWORD,
+      serveraddress: process.env.DOCKER_REGISTRY_ADDRESS,
+      email: process.env.DOCKER_REGISTRY_EMAIL,
+    };
+  }
 }

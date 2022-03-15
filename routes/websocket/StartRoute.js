@@ -14,7 +14,9 @@ export default (websocket, data) => {
   let dClient;
   try {
     const provider = getProviderById(data.toString());
-    dClient = new DockerClient(provider);
+    dClient = new DockerClient({
+      provider: provider,
+    });
 
     // console.log(dClient);
 
