@@ -12,6 +12,7 @@
     "express-session": "^1.17.2",
     "express-static": "^1.2.6",
     "express-ws": "^5.0.2",
+    "ioredis": "^4.28.5",
     "morgan": "^1.10.0",
     "redis": "^4.0.4",
     "uuidv4": "^6.2.12",

@@ -7,7 +7,7 @@ import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
 import session from "express-session";
-import redis from "redis";
+import redis from "ioredis";
 import connectRedis from "connect-redis";
 
 const redisStore = connectRedis(session);
