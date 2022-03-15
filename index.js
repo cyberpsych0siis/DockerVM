@@ -24,12 +24,6 @@ import enableWs from "express-ws";
 
   app.use("/health", HealthcheckRoute);
 
-  //   app.get("/api", (req, res) => {
-  // res.send("Digga ich fress nen Besen wenn das jetzt angezeigt wird");
-  //   });
-
-  //   app.get("/api", );
-
   APIRoute(app);
 
   //our http server which handles websocket proxy and static

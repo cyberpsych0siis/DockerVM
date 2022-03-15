@@ -4,6 +4,7 @@ import express from "express";
 import { isUuid } from "uuidv4";
 import Client from "../docker/Client.js";
 import DockerClient from "../DockerClient.js";
+import expressStatic from "express-static";
 
 import {
   DockerPullLogMessage,
@@ -18,20 +19,16 @@ import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
 export default (app) => {
   const api = express.Router();
 
-  api.get("/", (req, res) => {
+  /*   api.get("/", (req, res) => {
     res.send("Hello World");
-  });
-
-  api.get("/echo/:msg", (req, res) => {
-    res.send(req.params);
-  });
+  }); */
 
   let newDockerClient = new Client();
 
   //create new machine over REST
 
   api.post("/machine", (req, res) => {
-    console.log(api.headers);
+    console.log(req.headers);
     newDockerClient.createContainer(new HttpTraefikProvider()).then((data) => {
       //cache to redis here?
       const { channels } = data;
@@ -42,22 +39,12 @@ export default (app) => {
     });
   });
 
-  // enableWs(api);
+  // app.get("/machine", (req, res) => )
 
   api.get("/machine/:uuid", (req, res) => {
     console.log(req.headers);
     assert(isUuid(req.params.uuid));
-    /* newDockerClient.getContainerById(req.params.uuid).then(
-      (container) => {
-        console.log(container);
 
-        res.send(container);
-      },
-      () => {
-        res.status(404).end();
-      }
-    ); */
-    // res.send(dClient.getContainerByUuid(req.params.uuid));
     res.send(newDockerClient.getContainerTicket(req.params.uuid));
   });
 
