@@ -1,3 +1,5 @@
+import { LabelProvider } from "./LabelProvider.js";
+
 export class HttpTraefikProvider extends LabelProvider {
   /**
    *

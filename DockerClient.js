@@ -150,7 +150,10 @@ export default class DockerClient {
           },
           (err, s) => {
             if (err) rej(err);
-            res(s);
+            res({
+              logStream: s,
+              endpoint: this.addr,
+            });
           }
         );
       });

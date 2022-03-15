@@ -5,6 +5,7 @@
 // import RdpTraefikProvider from "../provider/RdpTraefikProvider.js";
 // import VsCodeTraefikProvider from "../provider/VsCodeTraefikProvider.js";
 import { VsCodeTraefikProvider } from "./VsCodeTraefikProvider.js";
+import { HttpTraefikProvider } from "./HttpTraefikProvider.js";
 
 export function getProviderById(id) {
   console.log(id);
@@ -14,8 +15,8 @@ export function getProviderById(id) {
   switch (id) {
     case "vscode":
       return new VsCodeTraefikProvider();
-    // case "http":
-    //   return new HttpTraefikProvider();
+    case "http":
+      return new HttpTraefikProvider();
 
     // case "vnc":
     //   return new VncTraefikProvider();

@@ -7,6 +7,7 @@ import {
   DockerLogMessage,
   WebsocketError,
   DockerPullLogMessage,
+  DockerEndpointCreated,
 } from "../../lib/Messages.js";
 
 export default (websocket, data) => {
@@ -15,13 +16,19 @@ export default (websocket, data) => {
     const provider = getProviderById(data.toString());
     dClient = new DockerClient(provider);
 
+    // console.log(dClient);
+
     dClient
       .pullImage(websocketStream(websocket), DockerPullLogMessage)
       .then(() => {
         dClient
           .start()
-          .then((logStream) => {
-            logStream.on("data", (d) => {
+          .then((data) => {
+            // console.log(data);
+            websocket.send(
+              JSON.stringify(new DockerEndpointCreated(data.endpoint))
+            );
+            data.logStream.on("data", (d) => {
               websocket.send(
                 JSON.stringify(new DockerLogMessage(d.toString()))
               );
