@@ -12,8 +12,4 @@ export class LabelProvider {
   }
 
   setWebsocket(ws) {}
-
-  static getProviderById(id) {
-    // getProviderById(id);
-  }
 }

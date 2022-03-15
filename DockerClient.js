@@ -55,6 +55,7 @@ export default class DockerClient {
     } else {
       this.provider = provider;
       this.addr = `${uuid()}.${this.options.subdomain}`;
+      console.log("new Container: " + this.addr);
     }
 
     this.dockerClient = new Docker();
