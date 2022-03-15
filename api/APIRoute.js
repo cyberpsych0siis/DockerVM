@@ -39,7 +39,7 @@ export default (app) => {
     });
   });
 
-  app.get("/machine", (req, res) => {
+  api.get("/machine", (req, res) => {
     res.send(req.session);
   });
 
