@@ -20,7 +20,7 @@ import process from "process";
 
   app.use("/health", HealthcheckRoute);
 
-  app.get("/_logs", (req, res) => {
+  app.get("/", (req, res) => {
     res.send("Digga ich fress nen Besen wenn das jetzt angezeigt wird");
   });
 
