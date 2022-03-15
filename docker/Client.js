@@ -15,7 +15,7 @@ export default class Client {
     networkId: process.env.NETWORK_ID ?? "nginx",
   };
 
-  tickets = new Map();
+  tickets = {};
 
   constructor(options = {}) {
     //Apply Options Arguments to Options Object
@@ -81,7 +81,7 @@ export default class Client {
     };
 
     // this.channels[newUuid] = ticket;
-    this.tickets.set(newUuid, ticket);
+    this.tickets[newUuid] = ticket;
 
     return ticket;
   }
