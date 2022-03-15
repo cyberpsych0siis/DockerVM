@@ -92,7 +92,7 @@ export default class Client {
   }
 
   getContainerTicket(id) {
-    return this.tickets.get(id);
+    return this.tickets[id];
   }
 
   async getContainerById(uuid, filters = null) {
