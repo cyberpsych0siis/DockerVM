@@ -89,7 +89,7 @@ export default class DockerClient {
 
   pullImage(logPipe, JsonTemplate) {
     return new Promise((res, rej) => {
-      let authObj = this.providerProps.private ? { authconfig: auth } : {};
+      let authObj = this.provider.private ? { authconfig: auth } : {};
 
       this.dockerClient.pull(
         this.providerProps.Image,
