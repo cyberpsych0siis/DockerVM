@@ -39,7 +39,9 @@ export default (app) => {
     });
   });
 
-  // app.get("/machine", (req, res) => )
+  app.get("/machine", (req, res) => {
+    res.send(req.session);
+  });
 
   api.get("/machine/:uuid", (req, res) => {
     console.log(req.headers);
