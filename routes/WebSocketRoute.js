@@ -10,7 +10,7 @@ import StartRoute from "./websocket/StartRoute.js";
 export default (expressServer) => {
   const websocketServer = new WebSocketServer({
     noServer: true,
-    path: "/",
+    path: "/socket",
   });
 
   expressServer.on("upgrade", (request, socket, head) => {
