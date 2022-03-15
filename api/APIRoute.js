@@ -47,7 +47,10 @@ export default (app) => {
     console.log(req.headers);
     assert(isUuid(req.params.uuid));
 
-    res.send(newDockerClient.getContainerTicket(req.params.uuid));
+    const answer = newDockerClient.getContainerTicket(req.params.uuid);
+    console.log(answer);
+
+    res.send(answer);
   });
 
   api.delete("/machine/:uuid", (req, res) => {
