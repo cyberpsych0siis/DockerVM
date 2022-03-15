@@ -13,7 +13,8 @@ const BOOTSTRAP_NOT_DEFINED =
 var auth = {
   username: process.env.DOCKER_REGISTRY_USERNAME,
   password: process.env.DOCKER_REGISTRY_PASSWORD,
-  auth: "",
+  email: "noreply@example.org",
+  serveraddress: process.env.DOCKER_REGISTRY_ADDRESS,
   email: process.env.DOCKER_REGISTRY_EMAIL,
 };
 
@@ -88,37 +89,41 @@ export default class DockerClient {
 
   pullImage(logPipe, JsonTemplate) {
     return new Promise((res, rej) => {
-      let auth = this.providerProps.private ? { authconfig: auth } : {};
+      let authObj = this.providerProps.private ? { authconfig: auth } : {};
 
-      this.dockerClient.pull(this.providerProps.Image, (err, stream) => {
-        // streaming output from pull...
-        if (err) {
-          // debugger;
-          rej(err);
-          // return;
-        } else {
-          console.log(stream);
+      this.dockerClient.pull(
+        this.providerProps.Image,
+        authObj,
+        (err, stream) => {
+          // streaming output from pull...
+          if (err) {
+            // debugger;
+            rej(err);
+            // return;
+          } else {
+            console.log(stream);
 
-          const onFinished = (err, output) => {
-            // console.log(output);
-            if (err) rej(err);
-            res();
-          };
+            const onFinished = (err, output) => {
+              // console.log(output);
+              if (err) rej(err);
+              res();
+            };
 
-          const onProgress = (event) => {
-            if (logPipe.writable) {
-              const pkg = new JsonTemplate(event);
-              logPipe.write(JSON.stringify(pkg));
-            }
-          };
+            const onProgress = (event) => {
+              if (logPipe.writable) {
+                const pkg = new JsonTemplate(event);
+                logPipe.write(JSON.stringify(pkg));
+              }
+            };
 
-          this.dockerClient.modem.followProgress(
-            stream,
-            onFinished,
-            onProgress
-          );
+            this.dockerClient.modem.followProgress(
+              stream,
+              onFinished,
+              onProgress
+            );
+          }
         }
-      });
+      );
     });
   }
 
