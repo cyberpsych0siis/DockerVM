@@ -13,7 +13,6 @@ const BOOTSTRAP_NOT_DEFINED =
 var auth = {
   username: process.env.DOCKER_REGISTRY_USERNAME,
   password: process.env.DOCKER_REGISTRY_PASSWORD,
-  email: "noreply@example.org",
   serveraddress: process.env.DOCKER_REGISTRY_ADDRESS,
   email: process.env.DOCKER_REGISTRY_EMAIL,
 };
