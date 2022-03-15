@@ -40,6 +40,10 @@ export default (app) => {
   });
 
   api.get("/machine", (req, res) => {
+    if (!req.session.counter) {
+      req.session.counter = 0;
+    }
+    req.session.counter++;
     res.send(req.session);
   });
 
