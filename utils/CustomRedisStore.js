@@ -23,7 +23,7 @@ export default class CustomRedisStore extends EventEmitter {
   }
 
   destroy(sid, callback) {
-    // console.log(sid);
+    console.log("Destroy " + sid);
     this.redisClient.del(sid);
     callback(null);
   }
