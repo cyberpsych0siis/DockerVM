@@ -1,4 +1,5 @@
 import EventEmitter from "events";
+import Session from './RedisSessionjs';
 
 export default class CustomRedisStore extends EventEmitter {
   options = {};
@@ -16,10 +17,12 @@ export default class CustomRedisStore extends EventEmitter {
   createSession(req, oldSession) {
     console.log(oldSession);
 
-    this.redisClient.get(this.sessionPrefix + oldSession.id).then((result) => {
+    /*this.redisClient.get(this.sessionPrefix + oldSession.id).then((result) => {
       req.session = JSON.parse(result);
-    });
+    });*/
     // req.session = this.storage.get(oldSession.id);
+    req.session = new Session(req, oldSession);
+    return req.session;
   }
 
   destroy(sid, callback) {
