@@ -681,7 +681,7 @@ has-yarn@^2.1.0:
 
 "header-session@https://github.com/cyberpsych0siis/header-session.git":
   version "0.0.1"
-  resolved "https://github.com/cyberpsych0siis/header-session.git#e38869c1e55cdd9c34616a1e7be5f3619f263600"
+  resolved "https://github.com/cyberpsych0siis/header-session.git#2260858a2d0ed1bcb70801c8968ae440128ec3ec"
 
 http-cache-semantics@^4.0.0:
   version "4.1.0"
