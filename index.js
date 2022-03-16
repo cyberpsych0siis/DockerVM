@@ -41,13 +41,6 @@ const client = redis.createClient({
         return req.headers["x-session"] ?? "invalid session token";
         // return uuid();
       },
-      /*       // create new redis store.
-      store: new redisStore({
-        host: "localhost",
-        port: 6379,
-        client: client,
-        ttl: 260,
-      }), */
       saveUninitialized: false,
       resave: true,
       store: new CustomRedisStore(

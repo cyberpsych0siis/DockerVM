@@ -44,8 +44,8 @@ export default class CustomRedisStore extends EventEmitter {
     // this.redis.set();
   }
 
-  touch(sid, session, callback) {
+  /*   touch(sid, session, callback) {
     // console.log(sid, session);
     callback(null);
-  }
+  } */
 }
