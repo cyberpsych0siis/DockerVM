@@ -10,7 +10,7 @@ import session from "express-session";
 import redis from "ioredis";
 // import connectRedis from "connect-redis";
 import { uuid } from "uuidv4";
-import CustomRedisStore from "./utils/CustomRedisStore.js";
+import Store from "./utils/Store.js";
 
 /* const redisStore = connectRedis(session);
 const client = redis.createClient({
@@ -43,7 +43,7 @@ const client = redis.createClient({
       },
       saveUninitialized: true,
       resave: true,
-      store: new CustomRedisStore(
+      store: new Store(
         redis.createClient({
           host: "redis",
         })
