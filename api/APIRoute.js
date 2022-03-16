@@ -40,7 +40,7 @@ export default (app) => {
   });
 
   api.get("/machine", (req, res) => {
-    if (!req.session.counter) {
+    if (req.session.counter === undefined) {
       req.session.counter = 0;
     }
     req.session.counter++;
