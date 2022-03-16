@@ -12,7 +12,6 @@ import redis from "ioredis";
 import { uuid } from "uuidv4";
 // import Store from "./utils/Store.js";
 
-import RedisStore from "./utils/pleaseJustWork.js";
 /* const redisStore = connectRedis(session);
 const client = redis.createClient({
   host: "redis",
@@ -34,35 +33,12 @@ const client = redis.createClient({
     })
   );
 
-  /*   app.use(
-    session({
-      secret: "ssshhhhh",
-      genid: function (req) {
-        // console.log(req.headers);
-        return req.headers["x-session"] ?? "invalid session token";
-        // return uuid();
-      },
-      saveUninitialized: true,
-      resave: true,
-      store: new Store(
-        redis.createClient({
-          host: "redis",
-        })
-      ),
-    })
-  ); */
-
   app.use(
-    session({
-      secret: "i am a dirty whore lol",
-      saveUninitialized: true,
-      resave: true,
-      store: new RedisStore(
-        redis.createClient({
-          host: "redis",
-        })
-      ),
-    })
+    session(
+      redis.createClient({
+        host: "redis",
+      })
+    )
   );
 
   app.use("/health", HealthcheckRoute);

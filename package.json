@@ -11,7 +11,7 @@
     "express": "^4.17.2",
     "express-static": "^1.2.6",
     "express-ws": "^5.0.2",
-    "header-session": "link:./session",
+    "header-session": "https://github.com/cyberpsych0siis/header-session.git",
     "ioredis": "^4.28.5",
     "morgan": "^1.10.0",
     "redis": "^4.0.4",
