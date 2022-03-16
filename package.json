@@ -9,7 +9,7 @@
     "connect-redis": "^6.1.2",
     "dockerode": "^3.3.1",
     "express": "^4.17.2",
-    "express-session": "^1.17.2",
+    "express-session": "https://github.com/cyberpsych0siis/session.git",
     "express-static": "^1.2.6",
     "express-ws": "^5.0.2",
     "ioredis": "^4.28.5",

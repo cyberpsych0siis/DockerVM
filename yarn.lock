@@ -497,10 +497,9 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
-express-session@^1.17.2:
+"express-session@https://github.com/cyberpsych0siis/session.git":
   version "1.17.2"
-  resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.17.2.tgz#397020374f9bf7997f891b85ea338767b30d0efd"
-  integrity sha512-mPcYcLA0lvh7D4Oqr5aNJFMtBMKPLl++OKKxkHzZ0U0oDq1rpKBnkR5f5vCHR26VeArlTOEF9td4x5IjICksRQ==
+  resolved "https://github.com/cyberpsych0siis/session.git#a1d590a967575a7cecd94c851c1c951e74e41e10"
   dependencies:
     cookie "0.4.1"
     cookie-signature "1.0.6"
