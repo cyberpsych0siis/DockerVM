@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import Session from './RedisSessionjs';
+import Session from './RedisSession.js';
 
 export default class CustomRedisStore extends EventEmitter {
   options = {};
