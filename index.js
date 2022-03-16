@@ -10,8 +10,9 @@ import session from "express-session";
 import redis from "ioredis";
 // import connectRedis from "connect-redis";
 import { uuid } from "uuidv4";
-import Store from "./utils/Store.js";
+// import Store from "./utils/Store.js";
 
+import RedisStore from "./utils/pleaseJustWork.js";
 /* const redisStore = connectRedis(session);
 const client = redis.createClient({
   host: "redis",
@@ -33,7 +34,7 @@ const client = redis.createClient({
     })
   );
 
-  app.use(
+  /*   app.use(
     session({
       secret: "ssshhhhh",
       genid: function (req) {
@@ -44,6 +45,19 @@ const client = redis.createClient({
       saveUninitialized: true,
       resave: true,
       store: new Store(
+        redis.createClient({
+          host: "redis",
+        })
+      ),
+    })
+  ); */
+
+  app.use(
+    session({
+      secret: "i am a dirty whore lol",
+      saveUninitialized: true,
+      resave: true,
+      store: new RedisStore(
         redis.createClient({
           host: "redis",
         })
