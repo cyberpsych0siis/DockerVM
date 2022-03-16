@@ -8,12 +8,14 @@ import enableWs from "express-ws";
 
 import session from "express-session";
 import redis from "ioredis";
-import connectRedis from "connect-redis";
+// import connectRedis from "connect-redis";
+import { uuid } from "uuidv4";
+import CustomRedisStore from "./utils/CustomRedisStore.js";
 
-const redisStore = connectRedis(session);
+/* const redisStore = connectRedis(session);
 const client = redis.createClient({
   host: "redis",
-});
+}); */
 
 (function () {
   const app = express();
@@ -35,17 +37,24 @@ const client = redis.createClient({
     session({
       secret: "ssshhhhh",
       genid: function (req) {
-        return req.headers["x-session"];
+        // console.log(req.headers);
+        return req.headers["x-session"] ?? "invalid session token";
+        // return uuid();
       },
-      // create new redis store.
+      /*       // create new redis store.
       store: new redisStore({
         host: "localhost",
         port: 6379,
         client: client,
         ttl: 260,
-      }),
+      }), */
       saveUninitialized: false,
-      resave: false,
+      resave: true,
+      store: new CustomRedisStore(
+        redis.createClient({
+          host: "redis",
+        })
+      ),
     })
   );
 

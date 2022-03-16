@@ -26,7 +26,6 @@ export default (app) => {
   let newDockerClient = new Client();
 
   //create new machine over REST
-
   api.post("/machine", (req, res) => {
     console.log(req.headers);
     newDockerClient.createContainer(new HttpTraefikProvider()).then((data) => {
@@ -39,6 +38,7 @@ export default (app) => {
     });
   });
 
+  //Get all machines for current user
   api.get("/machine", (req, res) => {
     if (req.session.counter === undefined) {
       req.session.counter = 0;
@@ -47,6 +47,7 @@ export default (app) => {
     res.send(req.session);
   });
 
+  //Get Machine Info for UUID
   api.get("/machine/:uuid", (req, res) => {
     console.log(req.headers);
     assert(isUuid(req.params.uuid));
@@ -62,6 +63,7 @@ export default (app) => {
     // res.send(answer);
   });
 
+  //delete the machine with uuid
   api.delete("/machine/:uuid", (req, res) => {
     assert(isUuid(req.params.uuid));
     newDockerClient.deleteContainer(req.params.uuid).then(() => {
