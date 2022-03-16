@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 
-export default class CustomRedisStore extends EventEmitter {
+export default class RedisStore extends EventEmitter {
   options = {};
 
   sessionPrefix = "sess_";
