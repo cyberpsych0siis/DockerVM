@@ -1,6 +1,9 @@
 import Session from "./Store.js;
 // import EventEmitter from "events";
 
+/**
+ * @deprecated
+ */
 export default class Session {
   regenerate(req, callback) {
     this.destroy(req.sessionID, (err) => {

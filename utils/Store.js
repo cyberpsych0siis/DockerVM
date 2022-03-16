@@ -1,6 +1,9 @@
 import EventEmitter from "events";
 import Session from "./Session.js";
 
+/**
+ * @deprecated
+ */
 export default class Store extends EventEmitter {
   options = {};
 
