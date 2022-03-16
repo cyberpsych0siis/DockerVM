@@ -6,7 +6,7 @@ import process from "process";
 import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
-import session from "header-session";
+import session from "header-session/session";
 import redis from "ioredis";
 // import connectRedis from "connect-redis";
 import { uuid } from "uuidv4";
