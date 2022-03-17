@@ -45,9 +45,14 @@ export default (app) => {
 
   //Get all machines for current user
   api.get("/machine", (req, res) => {
-    newDockerClient.getAllContainerForUserId(req.session.id).then((c) => {
-      res.send(c);
-    });
+    newDockerClient
+      .getAllContainerForUserId(req.session.id)
+      .then((c) => {
+        res.send(c);
+      })
+      .catch((e) => {
+        res.send(e);
+      });
   });
 
   //Get Machine Info for UUID
