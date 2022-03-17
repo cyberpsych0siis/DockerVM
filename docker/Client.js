@@ -66,7 +66,7 @@ export default class Client {
     Object.assign(properties, providerProperties);
     Object.assign(properties.Labels, labels);
 
-    // console.log(properties);
+    console.log(properties);
 
     // console.log(channels);
 
