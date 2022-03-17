@@ -26,7 +26,7 @@ export default class Client {
     this.dockerClient = new Docker();
   }
 
-  async createContainer(provider, pathPrefix = "/api/machine") {
+  async createContainer(provider, labels = {}, pathPrefix = "/api/machine") {
     //First create websockets for communication (log, pull, etc)
     const newUuid = uuid();
     const reachableHostname = `${newUuid}.${this.options.subdomain}`;
@@ -64,10 +64,11 @@ export default class Client {
     );
 
     Object.assign(properties, providerProperties);
+    Object.assign(properties.Labels, labels);
 
     // console.log(properties);
 
-    console.log(channels);
+    // console.log(channels);
 
     this.pullImage(provider).then(() => {
       return this.dockerClient.createContainer(properties);
@@ -91,8 +92,30 @@ export default class Client {
     container.start();
   }
 
+  /**
+   * @deprecated
+   * @param {*} id
+   * @returns
+   */
   getContainerTicket(id) {
     return this.tickets[id];
+  }
+
+  async getAllContainerForUserId(userId) {
+    return await new Promise((res, rej) => {
+      this.dockerClient
+        .listContainers({
+          all: true,
+          filters: {
+            label: ["com.rillo5000.ownerId=" + userId],
+          },
+        })
+        .then((err, containers) => {
+          if (err) rej(err);
+
+          res(containers);
+        });
+    });
   }
 
   async getContainerById(uuid, filters = null) {

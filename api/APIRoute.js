@@ -1,17 +1,18 @@
 import { assert } from "console";
-import Docker from "dockerode";
+// import Docker from "dockerode";
 import express from "express";
 import { isUuid } from "uuidv4";
 import Client from "../docker/Client.js";
-import DockerClient from "../DockerClient.js";
-import expressStatic from "express-static";
+import ContainerTicket from "../docker/ContainerTicket.js";
+// import DockerClient from "../DockerClient.js";
+// import expressStatic from "express-static";
 
-import {
-  DockerPullLogMessage,
-  DockerEndpointCreated,
-} from "../lib/Messages.js";
+// import {
+// DockerPullLogMessage,
+// DockerEndpointCreated,
+// } from "../lib/Messages.js";
 
-import { getProviderById } from "../provider/getProvider.js";
+// import { getProviderById } from "../provider/getProvider.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
 // import MachineRouter from "./MachineRouter.js";
 // import websocketStream from "websocket-stream";
@@ -28,29 +29,33 @@ export default (app) => {
   //create new machine over REST
   api.post("/machine", (req, res) => {
     console.log(req.headers);
-    newDockerClient.createContainer(new HttpTraefikProvider()).then((data) => {
-      //cache to redis here?
-      const { channels } = data;
-      delete data.channels;
-      // console.log(channels);
+    newDockerClient
+      .createContainer(new HttpTraefikProvider(), {
+        "com.rillo5000.ownerId": req.session.id,
+      })
+      .then((data) => {
+        //cache to redis here?
+        const { channels } = data;
+        delete data.channels;
+        // console.log(channels);
 
-      res.send(data);
-    });
+        res.send(data);
+      });
   });
 
   //Get all machines for current user
   api.get("/machine", (req, res) => {
-    if (req.session.counter === undefined) {
-      req.session.counter = 0;
-    }
-    req.session.counter++;
-    res.send(req.session);
+    newDockerClient.getAllContainerForUserId(req.session.id).then((c) => {
+      res.send(c);
+    });
   });
 
   //Get Machine Info for UUID
-  api.get("/machine/:uuid", (req, res) => {
-    console.log(req.headers);
+  api.get("/machine/:uuid", async (req, res) => {
+    // console.log(req.headers);
     assert(isUuid(req.params.uuid));
+
+    ContainerTicket(await newDockerClient.getContainerById(req.params.uuid));
 
     const answer = newDockerClient.getContainerTicket(req.params.uuid);
     if (answer) {

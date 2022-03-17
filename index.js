@@ -33,13 +33,7 @@ const client = redis.createClient({
     })
   );
 
-  app.use(
-    session(
-      redis.createClient({
-        host: "redis",
-      })
-    )
-  );
+  app.use(session());
 
   app.use("/health", HealthcheckRoute);
 
