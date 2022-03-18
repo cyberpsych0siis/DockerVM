@@ -44,6 +44,7 @@ export default (app) => {
     } else {
       req.session.counter++;
     }
+    
 
     res.send(req.session);
 
