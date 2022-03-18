@@ -3,7 +3,6 @@ import { assert } from "console";
 import express from "express";
 import { isUuid } from "uuidv4";
 import Client from "../docker/Client.js";
-// import ContainerTicket from "../docker/ContainerTicket.js";
 
 // import { getProviderById } from "../provider/getProvider.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
@@ -115,7 +114,7 @@ function createTicket(container) {
     id: uuid ?? "incompatible",
     name: container.Names[0].split("/").join(""),
     reachableHostname: reachableHostname ?? "incompatible",
-    endpoint: endpoint ?? "incompatible",
-    channels: channels ?? {},
+    // endpoint: endpoint ?? "incompatible",
+    // channels: channels ?? {},
   }
 };
