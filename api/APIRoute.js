@@ -50,7 +50,7 @@ export default (app) => {
   api.get("/machine/:uuid", (req, res) => {
     assert(isUuid(req.params.uuid));
 
-    newDockerClient.getContainerById(req.params.uuid).then(answer => {
+    newDockerClient.getContainerById(req.params.uuid).then((answer) => {
       if (answer) {
         res.status(200).send(createTicket(answer[0]));
       } else {
@@ -65,9 +65,9 @@ export default (app) => {
   //delete the machine with uuid
   api.delete("/machine/:uuid", (req, res) => {
     assert(isUuid(req.params.uuid));
-    newDockerClient.deleteContainer(req.params.uuid).then(() => {
+    newDockerClient.deleteContainer(req.params.uuid);
       res.status(200);
-    });
+      res.end();
   });
 
   // MachineRouter(api, newDockerClient);
