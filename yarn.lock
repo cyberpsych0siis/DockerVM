@@ -681,7 +681,7 @@ has-yarn@^2.1.0:
 
 "header-session@https://github.com/cyberpsych0siis/header-session.git":
   version "0.0.1"
-  resolved "https://github.com/cyberpsych0siis/header-session.git#09791f1ed49e47621cbef7725e60bb812072fddc"
+  resolved "https://github.com/cyberpsych0siis/header-session.git#cd90affb07259776351051cf26ac1da605b92f26"
   dependencies:
     ioredis "^4.28.5"
 

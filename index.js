@@ -1,5 +1,5 @@
 import logger from "morgan";
-import WebSocketRoute from "./routes/WebSocketRoute.js";
+// import WebSocketRoute from "./routes/WebSocketRoute.js";
 import HealthcheckRoute from "./routes/HealthcheckRoute.js";
 import express from "express";
 import process from "process";
@@ -7,9 +7,9 @@ import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
 import session from "header-session/session.js";
-import redis from "ioredis";
+// import redis from "ioredis";
 // import connectRedis from "connect-redis";
-import { uuid } from "uuidv4";
+// import { uuid } from "uuidv4";
 // import Store from "./utils/Store.js";
 
 /* const redisStore = connectRedis(session);

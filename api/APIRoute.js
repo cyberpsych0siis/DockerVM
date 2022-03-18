@@ -4,13 +4,6 @@ import express from "express";
 import { isUuid } from "uuidv4";
 import Client from "../docker/Client.js";
 import ContainerTicket from "../docker/ContainerTicket.js";
-// import DockerClient from "../DockerClient.js";
-// import expressStatic from "express-static";
-
-// import {
-// DockerPullLogMessage,
-// DockerEndpointCreated,
-// } from "../lib/Messages.js";
 
 // import { getProviderById } from "../provider/getProvider.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
@@ -45,6 +38,16 @@ export default (app) => {
 
   //Get all machines for current user
   api.get("/machine", (req, res) => {
+    
+    if (req.session.counter == undefined) {
+      req.session.counter = 0;
+    } else {
+      req.session.counter++;
+    }
+
+    res.send(req.session);
+
+    return;
     newDockerClient
       .getAllContainerForUserId(req.session.id)
       .then((c) => {
