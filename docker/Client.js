@@ -1,10 +1,8 @@
-// import WebSocketServer from "ws/lib/websocket-server";
 import { WebSocketServer } from "ws";
-
-import websocketStream from "websocket-stream";
 import { assert } from "console";
 import { isUuid, uuid } from "uuidv4";
 import Docker from "dockerode";
+import { mergeDeep } from "../utils/DeepCopySO.js";
 
 export default class Client {
   options = {
@@ -26,11 +24,11 @@ export default class Client {
     this.dockerClient = new Docker();
   }
 
-  async createContainer(provider, labels = {}, pathPrefix = "/api/machine") {
+  async createContainer(provider, ownerId = 0, pathPrefix = "/api/machine") {
     //First create websockets for communication (log, pull, etc)
     const newUuid = uuid();
     const reachableHostname = `${newUuid}.${this.options.subdomain}`;
-    const socketAddress = pathPrefix + "/" + newUuid + "/log";
+    const socketAddress = pathPrefix + "/" + newUuid;
 
     const channels = {
       log: new WebSocketServer({
@@ -40,7 +38,7 @@ export default class Client {
     };
 
     let properties = {
-      name: newUuid,
+      name: "I am a stegosaurus",
       Hostname: newUuid.split("-")[0],
       AttachStdin: false,
       AttachStdout: false,
@@ -54,7 +52,9 @@ export default class Client {
         },
       },
       Labels: {
-        "com.rillo5000.uuid": newUuid,
+        "com.rillo5000.uuid": String(newUuid),
+        "com.rillo5000.ownerId": String(ownerId),
+        "com.rillo5000.endpoint": String(socketAddress)
       },
     };
 
@@ -63,22 +63,18 @@ export default class Client {
       String(reachableHostname)
     );
 
-    Object.assign(properties, providerProperties);
-    Object.assign(properties.Labels, labels);
-
-    console.log(properties);
-
-    // console.log(channels);
+    mergeDeep(properties, providerProperties);
 
     this.pullImage(provider).then(() => {
       return this.dockerClient.createContainer(properties);
+    }).then(container => {
+      container.start();
     });
 
     const ticket = {
       id: newUuid,
       reachableHostname: reachableHostname,
-      socket: socketAddress,
-      channels: channels,
+      socket: socketAddress
     };
 
     // this.channels[newUuid] = ticket;
@@ -102,45 +98,24 @@ export default class Client {
   }
 
   async getAllContainerForUserId(userId) {
-    return await new Promise((res, rej) => {
-      this.dockerClient
-        .listContainers({
-          all: true,
-          filters: {
-            label: ["com.rillo5000.ownerId=" + userId],
-          },
-        })
-        .then((err, containers) => {
-          if (err) rej(err);
 
-          res(containers);
-        });
+    return this.dockerClient.listContainers({
+      all: true,
+      filters: {
+        label: ["com.rillo5000.ownerId=" + userId]
+      }
     });
   }
 
-  async getContainerById(uuid, filters = null) {
+  async getContainerById(uuid) {
     assert(isUuid(uuid));
 
-    return await new Promise((res, rej) => {
-      const str = `com.rillo5000.uuid=${uuid}`;
-      console.log(str);
-      this.dockerClient.listContainers(
-        {
-          all: true,
-          filters: filters ?? {
-            name: [uuid],
-          },
+    return this.dockerClient.listContainers({
+        all: true,
+        filters: {
+          label: ["com.rillo5000.uuid=" + uuid],
         },
-        (error, containers) => {
-          if (error) rej(error);
-          //   console.log(containers);
-          if (containers.length == 1) {
-            //   res(...containers);
-            res(this.dockerClient.getContainer(containers[0].id));
-          } else rej();
-        }
-      );
-    });
+      });
   }
 
   async deleteContainer(id) {
@@ -154,7 +129,7 @@ export default class Client {
   }
 
   pullImage(provider) {
-    console.log(provider);
+    // console.log(provider);
 
     // const properties = getProperties(containerName, reachableAddress) {
 

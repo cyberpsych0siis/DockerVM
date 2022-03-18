@@ -7,15 +7,6 @@ import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
 import session from "header-session/session.js";
-// import redis from "ioredis";
-// import connectRedis from "connect-redis";
-// import { uuid } from "uuidv4";
-// import Store from "./utils/Store.js";
-
-/* const redisStore = connectRedis(session);
-const client = redis.createClient({
-  host: "redis",
-}); */
 
 (function () {
   const app = express();
