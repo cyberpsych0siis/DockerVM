@@ -129,10 +129,6 @@ export default class Client {
   }
 
   pullImage(provider) {
-    // console.log(provider);
-
-    // const properties = getProperties(containerName, reachableAddress) {
-
     return new Promise((res, rej) => {
       this.dockerClient.pull(
         provider.Image, //TODO check
@@ -147,7 +143,7 @@ export default class Client {
 
             const onFinished = (err, output) => {
               if (err) console.error(err);
-              console.log(output);
+              // console.log(output);
               res();
             };
 
