@@ -15,5 +15,5 @@ ENV NETWORK_ID=vm_net
 # LABEL traefik.port=8085
 COPY . .
 RUN yarn
-CMD ["yarn", "start"]
+CMD ["yarn", "dev"]
 EXPOSE 8085
