@@ -38,7 +38,7 @@ export default class Client {
     };
 
     let properties = {
-      name: "I am a stegosaurus",
+      name: newUuid,
       Hostname: newUuid.split("-")[0],
       AttachStdin: false,
       AttachStdout: false,
@@ -68,6 +68,7 @@ export default class Client {
     this.pullImage(provider).then(() => {
       return this.dockerClient.createContainer(properties);
     }).then(container => {
+      // console.log("start me up");
       container.start();
     });
 
@@ -119,12 +120,18 @@ export default class Client {
   }
 
   async deleteContainer(id) {
+    // console.log(id);
     this.getContainerById(id).then(
       (container) => {
+        // console.log(container.length);
         // container.stop()
-        container.remove();
-      },
-      (err) => {}
+        const cont = this.dockerClient.getContainer(container[0].Id);
+        // console.log(cont);
+        cont.stop().then(e => {
+        }).finally(() => { 
+          cont.remove();
+        });
+      }
     );
   }
 
