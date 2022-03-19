@@ -1,6 +1,7 @@
 import { LabelProvider } from "./LabelProvider.js";
 
 export class VncTraefikProvider extends LabelProvider {
+  Image ="vncserver/lubuntu";
   /**
    *
    * @param {string} containerName
@@ -11,7 +12,7 @@ export class VncTraefikProvider extends LabelProvider {
   getProperties(containerName, reachableAddress) {
     return {
       Hostname: containerName,
-      Image: "vncserver/lubuntu",
+      Image: this.Image,
       Labels: {
         "traefik.enable": "true",
         // "traefik.port": "5901",
@@ -29,6 +30,7 @@ export class VncTraefikProvider extends LabelProvider {
 }
 
 export class NoVncTraefikProvider extends LabelProvider {
+  Image = "thallosaurus.de/jarvis/lubuntu-novnc";
   /**
    *
    * @param {string} containerName
@@ -38,7 +40,7 @@ export class NoVncTraefikProvider extends LabelProvider {
    */
   getProperties(containerName, reachableAddress) {
     return {
-      Image: "thallosaurus.de/jarvis/lubuntu-novnc",
+      Image: this.Image,
       Labels: {
         "traefik.enable": "true",
         "traefik.port": "80",

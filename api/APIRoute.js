@@ -6,6 +6,7 @@ import Client from "../docker/Client.js";
 
 // import { getProviderById } from "../provider/getProvider.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
+import { NoVncTraefikProvider } from "../provider/VncTraefikProvider.js";
 // import MachineRouter from "./MachineRouter.js";
 // import websocketStream from "websocket-stream";
 
@@ -20,9 +21,12 @@ export default (app) => {
 
   //create new machine over REST
   api.post("/machine", (req, res) => {
+
+    // NoVncTraefikProvider
+// new NoVncTraefikProvider    
     // console.log(req.headers);
     newDockerClient
-      .createContainer(new HttpTraefikProvider(), req.session.id)
+      .createContainer(new NoVncTraefikProvider(), req.session.id)
       .then((data) => {
         //cache to redis here?
         const { channels } = data;
