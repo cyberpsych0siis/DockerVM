@@ -7,7 +7,7 @@ import APIRoute from "./api/APIRoute.js";
 import enableWs from "express-ws";
 
 import session from "header-session/session.js";
-import cors from 'cors';
+import cors from "cors";
 
 (function () {
   const app = express();
@@ -27,21 +27,29 @@ import cors from 'cors';
 
   app.use(session());
 
-  const allowedOrigins = ["https://rillo5000.com", 'http://rillo5000.com', "http://localhost:3000"]
+  const allowedOrigins = [
+    "https://rillo5000.com",
+    "http://rillo5000.com",
+    "http://localhost:3000",
+  ];
 
-  app.use(cors({
-  origin: function(origin, callback){
-    // allow requests with no origin 
-    // (like mobile apps or curl requests)
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
-      var msg = 'The CORS policy for this site does not ' +
-                'allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-}));
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        // allow requests with no origin
+        // (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+          console.log(origin);
+          var msg =
+            "The CORS policy for this site does not " +
+            "allow access from the specified Origin.";
+          return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+      },
+    })
+  );
 
   app.use("/health", HealthcheckRoute);
 
