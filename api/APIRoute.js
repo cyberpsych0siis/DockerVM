@@ -7,6 +7,7 @@ import Client from "../docker/Client.js";
 // import { getProviderById } from "../provider/getProvider.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
 import { NoVncTraefikProvider } from "../provider/VncTraefikProvider.js";
+import { VsCodeTraefikProvider } from "../provider/VsCodeTraefikProvider.js";
 // import MachineRouter from "./MachineRouter.js";
 // import websocketStream from "websocket-stream";
 
@@ -21,12 +22,23 @@ export default (app) => {
 
   //create new machine over REST
   api.post("/machine", (req, res) => {
-
     // NoVncTraefikProvider
-// new NoVncTraefikProvider    
+    // new NoVncTraefikProvider
     // console.log(req.headers);
+    const { image, name } = req.body;
+
+    const provider = [
+      HttpTraefikProvider,
+      VsCodeTraefikProvider,
+      NoVncTraefikProvider,
+    ][image];
+
     newDockerClient
-      .createContainer(new HttpTraefikProvider(), req.session.id)
+      .createContainer(
+        name,
+        provider ?? new HttpTraefikProvider(),
+        req.session.id
+      )
       .then((data) => {
         //cache to redis here?
         const { channels } = data;
@@ -39,39 +51,42 @@ export default (app) => {
 
   //Get all machines for current user
   api.get("/machine", (req, res) => {
-    newDockerClient
-      .getAllContainerForUserId(req.session.id)
-      .then((c) => {
-        console.log(c.length);
-        res.send(c.map(e => {
+    newDockerClient.getAllContainerForUserId(req.session.id).then((c) => {
+      console.log(c.length);
+      res.send(
+        c.map((e) => {
           let proxy = createTicket(e);
           return proxy;
-        }));
-      })
+        })
+      );
+    });
   });
 
   //Get Machine Info for UUID
   api.get("/machine/:uuid", (req, res) => {
     assert(isUuid(req.params.uuid));
 
-    newDockerClient.getContainerById(req.params.uuid).then((answer) => {
-      if (answer) {
-        res.status(200).send(createTicket(answer[0]));
-      } else {
-        res.status(404).end();
-      }
-    }).catch(e => {
-      console.error(e);
-      res.send(e);
-    });
+    newDockerClient
+      .getContainerById(req.params.uuid)
+      .then((answer) => {
+        if (answer) {
+          res.status(200).send(createTicket(answer[0]));
+        } else {
+          res.status(404).end();
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        res.send(e);
+      });
   });
 
   //delete the machine with uuid
   api.delete("/machine/:uuid", (req, res) => {
     assert(isUuid(req.params.uuid));
     newDockerClient.deleteContainer(req.params.uuid);
-      res.status(200);
-      res.end();
+    res.status(200);
+    res.end();
   });
 
   // MachineRouter(api, newDockerClient);
@@ -98,7 +113,7 @@ const hostRegex = /Host\(`.*`\)/;
 
 function createTicket(container) {
   // container.inspect((container) => {
-    // console.log(container.Labels);
+  // console.log(container.Labels);
   // })
 
   console.log(container);
@@ -106,19 +121,21 @@ function createTicket(container) {
   // const reachableHostname = container.Labels["traefik.http.routers." + uuid + ".rule"];
   const channels = null;
   let reachableHostname = "incompatible";
-  
-  const hostRegexResult = hostRegex.exec(container.Labels["traefik.http.routers." + uuid + ".rule"] ?? "");
+
+  const hostRegexResult = hostRegex.exec(
+    container.Labels["traefik.http.routers." + uuid + ".rule"] ?? ""
+  );
   if (hostRegexResult !== null) {
-    reachableHostname = hostRegexResult[0].split("\`")[1];
+    reachableHostname = hostRegexResult[0].split("`")[1];
   }
 
   const endpoint = container.Labels["com.rillo5000.endpoint"];
-  
+
   return {
     id: uuid ?? "incompatible",
     name: container.Names[0].split("/").join(""),
     reachableHostname: "https://" + (reachableHostname ?? "incompatible"),
     // endpoint: endpoint ?? "incompatible",
     // channels: channels ?? {},
-  }
-};
+  };
+}

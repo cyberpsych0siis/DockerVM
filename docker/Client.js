@@ -24,7 +24,12 @@ export default class Client {
     this.dockerClient = new Docker();
   }
 
-  async createContainer(provider, ownerId = 0, pathPrefix = "/api/machine") {
+  async createContainer(
+    name,
+    provider,
+    ownerId = 0,
+    pathPrefix = "/api/machine"
+  ) {
     //First create websockets for communication (log, pull, etc)
     const newUuid = uuid();
     const reachableHostname = `${newUuid}.${this.options.subdomain}`;
@@ -38,7 +43,7 @@ export default class Client {
     };
 
     let properties = {
-      name: newUuid,
+      name: String(name.replace(" ", "_")),
       Hostname: newUuid.split("-")[0],
       AttachStdin: false,
       AttachStdout: false,
@@ -54,7 +59,7 @@ export default class Client {
       Labels: {
         "com.rillo5000.uuid": String(newUuid),
         "com.rillo5000.ownerId": String(ownerId),
-        "com.rillo5000.endpoint": String(socketAddress)
+        "com.rillo5000.endpoint": String(socketAddress),
       },
     };
 
@@ -65,17 +70,19 @@ export default class Client {
 
     mergeDeep(properties, providerProperties);
 
-    this.pullImage(provider).then(() => {
-      return this.dockerClient.createContainer(properties);
-    }).then(container => {
-      // console.log("start me up");
-      container.start();
-    });
+    this.pullImage(provider)
+      .then(() => {
+        return this.dockerClient.createContainer(properties);
+      })
+      .then((container) => {
+        // console.log("start me up");
+        container.start();
+      });
 
     const ticket = {
       id: newUuid,
       reachableHostname: reachableHostname,
-      socket: socketAddress
+      socket: socketAddress,
     };
 
     // this.channels[newUuid] = ticket;
@@ -99,12 +106,11 @@ export default class Client {
   }
 
   async getAllContainerForUserId(userId) {
-
     return this.dockerClient.listContainers({
       all: true,
       filters: {
-        label: ["com.rillo5000.ownerId=" + userId]
-      }
+        label: ["com.rillo5000.ownerId=" + userId],
+      },
     });
   }
 
@@ -112,27 +118,27 @@ export default class Client {
     assert(isUuid(uuid));
 
     return this.dockerClient.listContainers({
-        all: true,
-        filters: {
-          label: ["com.rillo5000.uuid=" + uuid],
-        },
-      });
+      all: true,
+      filters: {
+        label: ["com.rillo5000.uuid=" + uuid],
+      },
+    });
   }
 
   async deleteContainer(id) {
     // console.log(id);
-    this.getContainerById(id).then(
-      (container) => {
-        // console.log(container.length);
-        // container.stop()
-        const cont = this.dockerClient.getContainer(container[0].Id);
-        // console.log(cont);
-        cont.stop().then(e => {
-        }).finally(() => { 
+    this.getContainerById(id).then((container) => {
+      // console.log(container.length);
+      // container.stop()
+      const cont = this.dockerClient.getContainer(container[0].Id);
+      // console.log(cont);
+      cont
+        .stop()
+        .then((e) => {})
+        .finally(() => {
           cont.remove();
         });
-      }
-    );
+    });
   }
 
   pullImage(provider) {
