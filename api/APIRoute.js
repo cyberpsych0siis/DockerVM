@@ -117,7 +117,7 @@ function createTicket(container) {
   return {
     id: uuid ?? "incompatible",
     name: container.Names[0].split("/").join(""),
-    reachableHostname: "http://" + (reachableHostname ?? "incompatible"),
+    reachableHostname: "https://" + (reachableHostname ?? "incompatible"),
     // endpoint: endpoint ?? "incompatible",
     // channels: channels ?? {},
   }
