@@ -27,6 +27,8 @@ import cors from 'cors';
 
   app.use(session());
 
+  const allowedOrigins = ["https://rillo5000.com", 'http://rillo5000.com', "http://localhost:3000"]
+
   app.use(cors({
   origin: function(origin, callback){
     // allow requests with no origin 
