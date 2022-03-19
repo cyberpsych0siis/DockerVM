@@ -42,7 +42,7 @@ export class NoVncTraefikProvider extends LabelProvider {
       Labels: {
         "traefik.enable": "true",
         "traefik.port": "80",
-        ["traefik.http.routers." + containerName + ".entrypoints"]: "web",
+        ["traefik.http.routers." + containerName + ".entrypoints"]: "websecure",
         ["traefik.http.routers." + containerName + ".rule"]:
           "Host(`" + reachableAddress + "`)",
       },
