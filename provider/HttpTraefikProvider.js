@@ -17,6 +17,7 @@ export class HttpTraefikProvider extends LabelProvider {
         "traefik.port": "80",
         ["traefik.http.routers." + containerName + ".entrypoints"]: "web,websecure",
         ["traefik.http.routers." + containerName + ".tls.certresolver"]: "cloudflare",
+        ["traefik.http.routers." + containerName + ".tls.domains[0].main"]: "*." + (process.env.SUBDOMAIN ?? "app.localhost"),
         ["traefik.http.routers." + containerName + ".rule"]:
           "Host(`" + reachableAddress + "`)",
       },
