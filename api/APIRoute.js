@@ -26,7 +26,7 @@ export default (app) => {
 // new NoVncTraefikProvider    
     // console.log(req.headers);
     newDockerClient
-      .createContainer(new NoVncTraefikProvider(), req.session.id)
+      .createContainer(new HttpTraefikProvider(), req.session.id)
       .then((data) => {
         //cache to redis here?
         const { channels } = data;
