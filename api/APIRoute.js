@@ -21,7 +21,7 @@ export default (app) => {
   let newDockerClient = new Client();
 
   //create new machine over REST
-  api.post("/machine", (req, res) => {
+  api.post("/machine", express.json(), (req, res) => {
     // NoVncTraefikProvider
     // new NoVncTraefikProvider
     // console.log(req.headers);
