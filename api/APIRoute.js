@@ -8,6 +8,7 @@ import Client from "../docker/Client.js";
 import { HttpTraefikProvider } from "../provider/HttpTraefikProvider.js";
 import { NoVncTraefikProvider } from "../provider/VncTraefikProvider.js";
 import { VsCodeTraefikProvider } from "../provider/VsCodeTraefikProvider.js";
+import bodyParser from 'body-parser';
 // import MachineRouter from "./MachineRouter.js";
 // import websocketStream from "websocket-stream";
 
@@ -21,11 +22,12 @@ export default (app) => {
   let newDockerClient = new Client();
 
   //create new machine over REST
-  api.post("/machine", express.json(), (req, res) => {
+  api.post("/machine", bodyParser(), (req, res) => {
     // NoVncTraefikProvider
     // new NoVncTraefikProvider
     // console.log(req.headers);
     const { image, name } = req.body;
+    console.log(image, name);
 
     const provider = [
       HttpTraefikProvider,
@@ -36,7 +38,7 @@ export default (app) => {
     newDockerClient
       .createContainer(
         name,
-        provider ?? new HttpTraefikProvider(),
+        new provider() ?? new HttpTraefikProvider(),
         req.session.id
       )
       .then((data) => {

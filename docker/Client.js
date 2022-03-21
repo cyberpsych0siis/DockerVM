@@ -64,7 +64,7 @@ export default class Client {
     };
 
     const providerProperties = provider.getProperties(
-      String(properties.name),
+      String(newUuid),
       String(reachableHostname)
     );
 
