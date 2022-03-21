@@ -43,7 +43,7 @@ export default class Client {
     };
 
     let properties = {
-      name: String(name.replace(" ", "_")),
+      name: String(newUuid), //String(name.replace(" ", "_")),
       Hostname: newUuid.split("-")[0],
       AttachStdin: false,
       AttachStdout: false,
